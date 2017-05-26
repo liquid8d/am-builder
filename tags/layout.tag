@@ -12,6 +12,7 @@
         :scope {
             display: block;
             padding: 1em;
+            width: 100%;
             overflow: auto;
         }
 
