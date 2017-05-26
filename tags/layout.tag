@@ -82,9 +82,6 @@
         }.bind(this))
 
         this.selectedObject = null
-        this.isDragging = false
-        this.dragType = 'move'
-        this.cursor = [ 0, 0 ]
 
         updateElements() {
             this.config.objects.forEach(function(obj) {
@@ -244,7 +241,22 @@
             
             interact('.object')
                 .draggable({
-                    //restrict: { restriction: 'parent', endOnly: true, elementRect: { top: 0, left: 0, bottom: 1, right: 1 } },
+                    restrict: {
+                        /*
+                        restriction: function(x, y, element) {
+                            //TODO: fix zoom dragging here
+                            var rect = element.getBoundingClientRect();
+                            return {
+                                top: rect.y,
+                                right: rect.x + rect.width,
+                                bottom: rect.y + rect.height,
+                                left: rect.x
+                            }
+                        },
+                        */
+                        endOnly: true,
+                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                    },
                     snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity, relativePoints: [ { x: 0, y: 0 } ] }
                 })
                 .resizable({
