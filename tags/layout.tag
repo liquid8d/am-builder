@@ -293,38 +293,6 @@
                 }.bind(this))
         })
 
-        //save state of the layout
-        save() {
-            riot.mixin('utils').save('values', this.values)
-            //convert objects to standard JS object
-            var objects = []
-            this.config.objects.forEach(function(obj) {
-                var saveObj = {
-                    id: obj.id,
-                    label: obj.label,
-                    locked: obj.locked,
-                    type: obj.type,
-                    aspect_values: obj.aspect_values,
-                    values: obj.values
-                }
-                objects.push(saveObj)
-            })
-            riot.mixin('utils').save('objects', objects)
-        }
-
-        //restore state of the layout
-        resume() {
-            //create objects from standard JS object
-            var objects = riot.mixin('utils').load('objects')
-            var loadedObjects = []
-            objects.forEach(function(obj) {
-                console.log('creating object: ' + obj.type)
-                this.addAMObject( window[obj.type]( -1, -1, 1, 1 ) )
-            }.bind(this))
-            this.config.objects = loadedObjects
-            this.values = riot.mixin('utils').load('values')
-        }
-
         //create a zipfile of the layout contents, and prompt the user to save it
         createZip() {
             var zip = new JSZip()
