@@ -94,8 +94,10 @@
 
         toggleSnap() {
             this.config.editor.snap = !this.config.editor.snap
+            interact('.object').options.drag.snap.enabled = this.config.editor.snap
+            interact('.object').options.resize.snap.enabled = this.config.editor.snap
         }
-        
+
         toggleGridlines() {
             this.config.editor.gridlines = !this.config.editor.gridlines
             this.root.querySelector('.gridlines').style.display = ( this.config.editor.gridlines ) ? '' : 'none'
@@ -235,156 +237,60 @@
             this.trigger('object-deselected')
         }
 
-        getElementTop(el) {
-            var yPos = el.offsetTop
-            var parentEl = el.offsetParent
-            while ( parentEl != null ) {
-                yPos += parentEl.offsetTop
-                parentEl = parentEl.offsetParent
-            }
-            return yPos
-        }
-
-        getElementLeft(el) {
-            var xPos = el.offsetLeft
-            var parentEl = el.offsetParent
-            while ( parentEl != null ) {
-                xPos += parentEl.offsetLeft
-                parentEl = parentEl.offsetParent
-            }
-            return xPos
-        }
-
         this.on('mount', function() {
             this.root.onmousedown = function(e) {
                 this.select(e.target)
             }.bind(this)
             
-            this.root.onmousemove = function(e) {
-                this.cursor[0] = e.clientX //?? * (this.config.editor.zoom / 100)
-                this.cursor[1] = e.clientY //?? * (this.config.editor.zoom / 100)
-                this.trigger('cursor-move')
-                var selected = this.selectedObject
-                if ( selected && this.isDragging ) {
-                    switch( this.dragType ) {
-                        case 'resizeTL':
-                            selected.values.x += e.movementX
-                            selected.el.style.left = selected.values.x + 'px'
-                            selected.values.width -= e.movementX
-                            selected.el.style.width = selected.values.width + 'px'
-                            selected.values.y += e.movementY
-                            selected.el.style.top = selected.values.y + 'px'
-                            selected.values.height -= e.movementY
-                            selected.el.style.height = selected.values.height + 'px'
-                            selected.el.style.cursor = 'nwse-resize'
-                            break
-                        case 'resizeTR':
-                            selected.values.y += e.movementY
-                            selected.el.style.top = selected.values.y + 'px'
-                            selected.values.height -= e.movementY
-                            selected.el.style.height = selected.values.height + 'px'
-                            selected.values.width += e.movementX
-                            selected.el.style.width = selected.values.width + 'px'
-                            selected.el.style.cursor = 'nesw-resize'
-                            break
-                        case 'resizeBR':
-                            selected.values.width += e.movementX
-                            selected.values.height += e.movementY
-                            selected.el.style.width = selected.values.width + 'px'
-                            selected.el.style.height = selected.values.height + 'px'
-                            selected.el.style.cursor = 'nwse-resize'
-                            break
-                        case 'resizeBL':
-                            selected.values.x += e.movementX
-                            selected.el.style.left = selected.values.x + 'px'
-                            selected.values.width -= e.movementX
-                            selected.el.style.width = selected.values.width + 'px'
-                            selected.values.height += e.movementY
-                            selected.el.style.height = selected.values.height + 'px'
-                            break
-                        case 'resizeT':
-                            selected.values.y += e.movementY
-                            selected.el.style.top = selected.values.y + 'px'
-                            selected.values.height -= e.movementY
-                            selected.el.style.height = selected.values.height + 'px'
-                            break
-                        case 'resizeR':
-                            selected.values.width += e.movementX
-                            selected.el.style.width = selected.values.width + 'px'
-                            selected.el.style.cursor = 'ew-resize'
-                            break
-                        case 'resizeB':
-                            selected.values.height += e.movementY
-                            selected.el.style.height = selected.values.height + 'px'
-                            selected.el.style.cursor = 'ns-resize'
-                            break
-                        case 'resizeL':
-                            selected.values.x += e.movementX
-                            selected.el.style.left = selected.values.x + 'px'
-                            selected.values.width -= e.movementX
-                            selected.el.style.width = selected.values.width + 'px'
-                            break
-                        case 'move':
-                            if ( this.config.editor.snap ) {
-                                var newPos = {
-                                    x: selected.values.x += e.movementX,
-                                    y: selected.values.y += e.movementY
-                                }
-                                selected.values.x = Math.ceil( ( e.clientX - newPos.x ) / 25 ) * 25
-                                selected.values.y = Math.ceil( ( e.clientY - newPos.y ) / 25 ) * 25
-                                console.log(selected.values.x + 'x' + selected.values.y)
-                            } else {
-                                selected.values.x += e.movementX
-                                selected.values.y += e.movementY
-                            }
-                            selected.el.style.left = selected.values.x + 'px'
-                            selected.el.style.top = selected.values.y + 'px'
-                            break
-                    }
+            interact('.object')
+                .draggable({
+                    //restrict: { restriction: 'parent', endOnly: true, elementRect: { top: 0, left: 0, bottom: 1, right: 1 } },
+                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity, relativePoints: [ { x: 0, y: 0 } ] }
+                })
+                .resizable({
+                    preserveAspectRatio: false,
+                    edges: { left: true, right: true, bottom: true, top: true },
+                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity, relativePoints: [ { x: 0, y: 0 } ] }
+                })
+                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
+                .on('dragmove', function(event) {
+                    if ( !this.selectedObject ) return
+                    var left = event.target.offsetLeft + event.dx
+                    var top = event.target.offsetTop + event.dy
+                    
+                    event.target.style.left = left + 'px'
+                    event.target.style.top = top + 'px'
+
+                    this.selectedObject.values.x = left
+                    this.selectedObject.values.y = top
                     this.trigger('object-update')
-                } else if ( selected && !this.isDragging ) {
-                    if ( selected.locked ) {
-                        selected.el.style.cursor = 'default'
-                    } else {
-                        //setup drag resizing or movement
-                        //var objLeft = .parentElement.offsetLeft + selected.el.offsetLeft
-                        var objLeft = this.getElementLeft(selected.el)
-                        var objRight = objLeft + selected.values.width
-                        var objTop = this.getElementTop(selected.el)
-                        //var objTop = selected.el.parentElement.offsetTop + selected.el.offsetTop
-                        var objBottom = objTop + selected.values.height
-                        barBottom.setMessage(3, 'selected rect x: ' + objLeft + '-' + objRight + 'y: ' + objTop + '-' + objBottom)
-                        if ( e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 && e.clientY >= objTop - 3 && e.clientY <= objTop + 3) {
-                            selected.el.style.cursor = 'nwse-resize'
-                            this.dragType = 'resizeTL'
-                        } else if ( e.clientY >= objTop - 3 && e.clientY <= objTop + 3 && e.clientX >= objRight - 3 && e.clientX <= objRight + 3) {
-                            selected.el.style.cursor = 'nesw-resize'
-                            this.dragType = 'resizeTR'
-                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 && e.clientX >= objRight - 3 && e.clientX <= objRight + 3 ) {
-                            selected.el.style.cursor = 'nwse-resize'
-                            this.dragType = 'resizeBR'
-                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 && e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 ) {
-                            selected.el.style.cursor = 'nesw-resize'
-                            this.dragType = 'resizeBL'
-                        } else if ( e.clientY >= objTop - 3 && e.clientY <= objTop + 3 ) {
-                            selected.el.style.cursor = 'ns-resize'
-                            this.dragType = 'resizeT'
-                        } else if ( e.clientX >= objRight - 3 && e.clientX <= objRight + 3 ) {
-                            selected.el.style.cursor = 'ew-resize'
-                            this.dragType = 'resizeR'
-                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 ) {
-                            selected.el.style.cursor = 'ns-resize'
-                            this.dragType = 'resizeB'
-                        } else if ( e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 ) {
-                            selected.el.style.cursor = 'ew-resize'
-                            this.dragType = 'resizeL'
-                        } else {
-                            selected.el.style.cursor = 'move'
-                            this.dragType = 'move'
-                        }
-                    }
-                }
-            }.bind(this)
+                }.bind(this))
+                .on('resizemove', function(event) {
+                    if ( !this.selectedObject || this.selectedObject.locked ) return
+                    console.log('interact resize')
+                    var target = event.target,
+                        x = (parseFloat(target.getAttribute('data-x')) || 0),
+                        y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+                    // update the element's style
+                    target.style.width  = event.rect.width + 'px';
+                    target.style.height = event.rect.height + 'px';
+
+                    // translate when resizing from top or left edges
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
+                    
+                    var left = event.target.offsetLeft + x
+                    var top = event.target.offsetTop + y
+                    target.style.left = left + 'px'
+                    target.style.top = top + 'px'
+                    
+                    this.selectedObject.values.x = left
+                    this.selectedObject.values.y = top
+                    this.selectedObject.values.width = event.rect.width
+                    this.selectedObject.values.height = event.rect.height
+                    this.trigger('object-update')
+                }.bind(this))
         })
 
         //save state of the layout

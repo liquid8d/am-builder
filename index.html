@@ -8,6 +8,7 @@
         <script src="js/riot-mixin-utils.js"></script>
         <script src="js/jszip.min.js"></script>
         <script src="js/FileSaver.min.js"></script>
+        <script src="js/interact.min.js"></script>
         <script>
             var utils = riot.mixin('utils')
         </script>
@@ -47,8 +48,6 @@
                 <button onclick="console.table(data.displays[data.displayIndex].romlist)">CurrentList</button>
                 <button onclick="console.table(layout.config.media)">Media</button>
                 <button onclick="console.dir(layout.selectedObject)">Object Vals</button>
-                <button onclick="layout.save()">Save</button>
-                <button onclick="layout.resume()">Resume</button>
             </div>
             <!-- bottom toolbar -->
             <bar-bottom class="horizontal-toolbar bottom"></bar-bottom>
