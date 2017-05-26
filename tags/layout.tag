@@ -58,7 +58,8 @@
         this.config = {
             editor: {
                 zoom: 100,
-                gridlines: true
+                gridlines: true,
+                snap: true
             },
             globals: {
                 width: { label: 'width', type: 'number', default: 640 },
@@ -91,6 +92,10 @@
             })
         }
 
+        toggleSnap() {
+            this.config.editor.snap = !this.config.editor.snap
+        }
+        
         toggleGridlines() {
             this.config.editor.gridlines = !this.config.editor.gridlines
             this.root.querySelector('.gridlines').style.display = ( this.config.editor.gridlines ) ? '' : 'none'
@@ -320,8 +325,18 @@
                             selected.el.style.width = selected.values.width + 'px'
                             break
                         case 'move':
-                            selected.values.x += e.movementX
-                            selected.values.y += e.movementY
+                            if ( this.config.editor.snap ) {
+                                var newPos = {
+                                    x: selected.values.x += e.movementX,
+                                    y: selected.values.y += e.movementY
+                                }
+                                selected.values.x = Math.ceil( ( e.clientX - newPos.x ) / 25 ) * 25
+                                selected.values.y = Math.ceil( ( e.clientY - newPos.y ) / 25 ) * 25
+                                console.log(selected.values.x + 'x' + selected.values.y)
+                            } else {
+                                selected.values.x += e.movementX
+                                selected.values.y += e.movementY
+                            }
                             selected.el.style.left = selected.values.x + 'px'
                             selected.el.style.top = selected.values.y + 'px'
                             break
