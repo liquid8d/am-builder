@@ -10,6 +10,8 @@
     <select id="zoom" onchange="{setZoom}">
         <option each="{ val in zoomLevels }" value="{val}" selected="{ val == defaultZoom }">{val}%</option>
     </select>
+    <span>Show Grid</span>
+    <input if="{layout}" type="checkbox" checked onchange="{layout.toggleGridlines}" />
     <script>
         this.zoomLevels = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 ]
         this.defaultZoom = 100
