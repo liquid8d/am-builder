@@ -26,6 +26,7 @@
         <script src="tags/menu-media.tag" type="riot/tag"></script>
         <script src="tags/bar-top.tag" type="riot/tag"></script>
         <script src="tags/bar-bottom.tag" type="riot/tag"></script>
+        <script src="tags/resizer.tag" type="riot/tag"></script>
         <link href="css/style.css" rel="stylesheet"></link>
         <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet">
     </head>
@@ -35,6 +36,7 @@
             <bar-top class="horizontal-toolbar top"></bar-top>
             <div class="main">
                 <menu></menu>
+                <resizer></resizer>
                 <layout></layout>
             </div>
             <!-- dev toolbar(s) -->
@@ -91,7 +93,14 @@
                 menuMedia = riot.mount('menu-media')[0]
                 barTop = riot.mount('bar-top')[0]
                 barBottom = riot.mount('bar-bottom')[0]
-
+                
+                //hook up menu resizer
+                var menuResizer = riot.mount('resizer')[0]
+                menuResizer.on('resize', function(e) {
+                    console.log('menu resizing')
+                    document.querySelector('menu').style.flexBasis = (e.clientX + e.movementX - 2) + 'px'
+                })
+                
                 //mount layout and hook components to the layout
                 layout = riot.mount('layout')[0]
                 barTop.setLayout(layout)

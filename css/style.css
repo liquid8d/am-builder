@@ -63,7 +63,6 @@ menu {
     flex-direction: column;
     flex: 0 0;
     background: rgb(30, 30, 30);
-    border-right: 1px solid rgb(20,20,20);
     color: rgb(180, 180, 180);
     flex-basis: 192px;
 }
