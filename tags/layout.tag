@@ -1,0 +1,496 @@
+<layout>
+    <!--
+        triggers:
+            object-added
+            object-selected
+            object-deselected
+            object-deleted
+            object-update
+            media-added
+    -->
+    <style>
+        :scope {
+            display: block;
+            padding: 1em;
+            overflow: auto;
+        }
+
+        .layout {
+            position: relative;
+            background: #000;
+            width: 640px;
+            height: 480px;
+            overflow: hidden;
+        }
+
+        .object {
+            position: absolute;
+            cursor: pointer;
+        }
+        .object.image {
+            background-size: contain;
+        }
+
+        .selected {
+            border-style: inset;
+            border: 1px dashed yellow;
+        }
+    </style>
+    <div class= "layout"></div>
+    <script>
+        this.idCounter = 1
+        this.idCounterMedia = 1
+        this.aspect = 'Standard (4x3)'
+        this.aspects = [ 'Standard (4x3)', 'Standard Vert (3x4)', 'Wide (16x10)', 'Wide Vert (10x16)', 'HD (16x9)', 'HD Vert (9x16)' ]
+        this.values = {}
+        this.config = {
+            editor: {
+                zoom: 100
+            },
+            globals: {
+                width: { label: 'width', type: 'number', default: 640 },
+                height: { label: 'height', type: 'number', default: 480 },
+                font: { label: 'font', type: 'dropdown', default: 'Arial', values: [ 'Arial' ] },
+                base_rotation: { label: 'base_rotation', type: 'select', default: 'RotateScreen.None', values: [ 'RotateScreen.None', 'RotateScreen.Right', 'RotateScreen.Flip', 'RotateScreen.Left' ] },
+                toggle_rotation: { label: 'toggle_rotation', type: 'select', default: 'RotateScreen.None', values: [ 'RotateScreen.None', 'RotateScreen.Right', 'RotateScreen.Flip', 'RotateScreen.Left' ] },
+                page_size: { label: 'page_size', type: 'number', default: 10 },
+                preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false }
+            },
+            objects: [],
+            media: [
+                { label: 'missing.png', name: 'missing.png', data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAADwCAYAAABxLb1rAAARVUlEQVR4nO3d7W+b1t/H8W+LF2RavDilook3S5YSqVL/yeuPXCVLqebNm9ugkgSZ5Vi4Rrke5AdNHMDgm9x9369Hq43hEM8fzuHc8Orw8PBaAECh149dAAB4LAQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoBYBCEAtAhCAWgQgALUIQABqEYAA1CIAAahFAAJQiwAEoFbrsQuAl82yLHFdVxzHEcdxpNVqyd7enti2fWe7JElkPp/LYrEQY4wYYySOY0nT9JFKDg1eHR4eXj92IfCyOI4jnuflwbeJLAjDMBRjzJZKCNwgALEVlmWJ53ni+/692t22JEkiQRBIGIbUDLEVBCA2YlmW+L4vHz58EMuyHuSYaZrK2dmZBEFAEGIjBCDW5nme9Pv9Bwu+ZWmayng8ljAMH+X4eP4IQDRm27YMBgNxXfexiyIiInEcy2g0kiRJHrsoeGYIQDTS7XZlMBg0qvXN53OZTqd57+58Pr8XVrZty97eXt5b3Ol0ZG9vr/Yx0jSV0Wgkl5eXtT8DEICord/vi+/7tbY1xkgYhhJF0do1M9u2ZX9/XzzPq92bHASBjMfjtY4HfQhA1DIYDMTzvJXbxXEsk8lE4jje6vFd15Ver1er2R2GoYxGo60eHy8TAYiVjo+PpdvtVm5jjJHxeLz14Fvmuq70+/2VNcLLy0v58uXLTsuC548ARKVVNb80TWUymUgQBA9YKhHf96Xf71duQ00QqzAVDqX6/X5l+BljZDQaPcoMjSAIJI5jOTk5Ke0s8TwvHyoDFGExBBTqdruVHR7GGBkOh486Pc0YI3/88UdlGXzfX9l8h14EIO7JxvmViaJIhsPhk5iFkaapDIfDynuPg8FgZ9Pz8LwRgLinapyfMUb+/PPPJxF+mTRN5fT0tLQmaFlWZaBDLwIQd2SruBTJmr1PKfwyWU1wPp8Xvu+6bq1hPNCFThDkLMsq7VnNZloUhZ9t2/L777/nQ1OMMfLPP/9sbWpa3f1nNcFPnz4V7qff78vl5eWTDHA8Dst13f977ELgaTg6OpJff/218L1///1Xoii697pt2/Lp06d8sdNWqyXtdls8z5OLi4uNw6bp/n/8+CFpmhaex+vXr+X6+nrnYxXxfNAEhoj8XNaqiDGmdJxf2WowVbXJJtbZfxAEpfcDfd9/tNVr8PQQgBCRm3t/ZcFQNY6uampau93euFzr7r+szNnCrYAIAYj/Kav9xXG8dpPx1atXmxRpo/1Xlbvugg54+QhAiOM4pePkJpNJ5WerwnEbg6Q32X9Z2W3b3vhZJXgZCECUNgmzBxJVGY/HhR0d25qCtsn+4zguDUmawRChFxgi8ttvv8kvv/xy7/Vv377J1dVV5WfTNJWLiwuxbVtev34taZpKHMfy5cuXrQyD2XT/r1+/Lu0R/v79+8blw/PGOEDlLMsqbQ4WDXspkiSJnJ6ebrNYW9t/FEWFvcWO44hlWYwJVI4msHKdTqfw9aJl65+j7IHrRcrOHXoQgMqV1f5e0rM1ptNp4et0hIAAVK4sBF5C7S9T1hFCAIIAVK5q1ZeXomqVGOhGACpXtppy2X2z56jsXAhAEIDKlQ2AfklN4LJzoQkMAhCAWgQgALUIQABqEYDKlXUQvKSHCJWdy0vq6MF6CEDlyjoIynqHn6Oyc3lJHT1YD3OBlSubC+s4zlaXjnccR/b39/Ol7ZcXOo3jWBaLhRhjJIqirY5D1DDYG+shAJUzxsj+/v6917cxRMS2bfF9X/b391c2qbNA7Ha70uv1JEkSiaJIgiDYOKjKzoUmMAhA5cpqWlVL0a+SPa9jkzX3svD0fV/CMCxdF7COqsd8QjcCULmyhQJs2xbbthvXvrrdbuWD1dfheZ50u10ZjUaNF2nIzqNI2blDDzpBlEvTtLQmVNQ0rjIYDOT4+HgnU8wsy5Lj42MZDAaNPld2DsYY1gIEAYjy527UbcJm4fQQy8x7ntcoZMvKxLOBIUITGCIShmHhk9IcxxHXdVeGxWAwkG63u/I4xhgJw7DwWSOu60qn08l7iqt0u11J01RGo1Hldq7rlu4rDMOV5cXLRwBCjDEyn88Lx8v1ej0ZDoeln60TfmEYytevXyvvJ2aPsZxMJmLbthwdHVXWKLP3qkKw1+sVvj6fz+kAgYjQBMb/nJ2dFb7uum5pL2q3260MKWOMfP78WUajUaPOlCRJZDQayefPnyuDKuscaVrusnOFPgQgROSmllbWKVD0UKGq10VuanTD4XCjmpYxRobDYWUTvGnZ0jSl+YscAQgRuQmGIAgK33Mcp/Ae4XA4LHxyXBZ+2+hlTdO0NASjKCpsnvu+X3rvLwgCen+RIwCROzs7q6wFLodK9rjK4XCYz6owxuzkEZmnp6f5MebzuQyHQzk9Pb3XtHYcp7L2R/MXt/FgdOSur6/lx48fpffV3r59KxcXF3J9fX3n9fl8LkEQyKtXr+Tbt287mWJ2fX2dzxe+HYa3WZYlHz9+lFaruG/v77//Xvmgd+jy6vDw8Hr1ZtDk48ePldPHttW83aYs/MqavlmzHLiNJjDuGY1GlavEnJycPKkHClmWJScnJ6XhV2fMIHQiAHFPNgyljOu68vHjxycRglnNr2rxhqbDcKAHAYhCl5eXpb3CIjc1wU+fPj3qk9XqlCEIgsYLKEAP7gGi0mAwWDnHdzweV4blLvi+XzkOUeRmbCNNX1QhALHSycnJypVhjDEyHo93vsiA67qFQ3KWEX6ogwBELXVqgiKSz+fddhC6riu9Xq/WQq2EH+oiAFFbv98vnBFSJFv5JYqitTsgbNuW/f198Tyv9r3GIAhkPB6vdTzoQwCikXVWfE6SROI4FmNMvvLMcijati17e3viOE6+DFeTR3NmQ13o8EATBCAas21bBoPBRs8N2aY4jhnqgrUQgFib53nS7/cfbTxgmqYyHo9Z3QVrIwCxEcuy5MOHD+L7/oMFYbZyTdXiDUAdBCC2wrIs8TxPPnz4ULiy9DbM53M5OzurXLsQaIIAxNY5jiOe51U+k6Ou7Pkh2bNEgG0iALFTlmVJp9PJe3cty8p7fG/Leoazx3QaY2Q6nVLTw04RgADUYjEEAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUaj12AV4S3/clCILGn+v3+zIej6Xdbsv79+/z1y3LkjRN839///5dZrOZiIi02205ODiQxWIhSZKIiMibN29ksVjIdDrNt7ttf39fbNsWEZEkSaTVaollWSIicn5+LovFIt+u0+mUlmM8Hkuv15OLi4vC4xQdV0QkiqLC9968eSNJkojjOJKmaV6O22Vqap3vot1uS6fTyT/X7/dlOp1Wfua///6TxWIhvu/n38Nt2XeSpqmEYXjv/X6/n//38t95Op0W/s1ERFzXlU6nI5PJpNa5oRgBuEVpmorneYX/o5fxfT8PodlsJuPxOH9vf3+/8AfgeZ4sFot7//Nn23qeJ61WS+I4vnMcY0xpKPR6PQmCQBaLhURRdOe4ReWwLEsODg7W/gG2Wi3xfV+urq5K9+F5nliWtdZFpdVqieu6d/4GqxwcHOTfRaYsgJYlSVK4bfZau92WXq8nV1dXd7ar830X6XQ6a18c8BNN4C1aLBayWCyk3W7X2t51XUmS5M5Vf5V2uy2WZVX+UMIwlE6nI63WzfXN8zwxxlSGwWQykaOjo9rlEBEJgkB832/0GZGf4RcEwcrzmE6n0uv1Gh/j6upKHMepvf26tfe6ZrOZTCaT/CK5iVarJUmSyHQ63Xhf2hGAWxZFkRwcHNTa1nGc2lf8zO0mWpUgCPKmp2VZtWpCxpg8NOvImt91Az9zdHQkk8mkVg1mNpvJxcXFWkF7fn5e63PtdluSJHmQGlX2Pbiuu/Y+spribDa7V2NFMwTgDtSpGfm+L+fn5433XXSfqchiscib4nU/E4Zh4xBoEvgiNz/e79+/NzrGbDaTVqvVKJxFfgb0qrA5ODhofCHaRBiGjWqny2zbvvM9Nb0A4ScCcAdW1Yyypu86NY6sE2PXn2miSVPYtu1aHSdFx1hHFEWVYbPrpm8ZY8xatUDXdeXq6ir/dxAEjS5AuIsA3JGqmtE6Td+MMSZv2jbRtPbURN2alog0ut+5fIx1m6hlTeGHbPoui+N4rVpgt9t90NrqS0cA7lBRzWjdpm8mjmNptVqNbn5n5djkvtMqURRJt9ut3MZ13UcJm7KAfuim76ayzo9lFxcXdIasiWEwO3S7KTybzTZq+t4WhqG0223xfT//Udi2LUmSSJIkhR0ek8lEXNcV3/fFtm2ZTqfS6XRkOp1KkiRrNUuXff36VXq9XumwluVxbg8piiLxfT//29Rp+r59+/bOOL0it4exNNX01sS7d+8KL56z2Yxm8JoIwB2LoigPBcdxtna/aTabFYZWFnJF49LiOL4Tjtn72cDnVUNlVrld0yrbz2P2WmZN4Sz0V12I/vvvv40CbpWmF4Plzo/bsuFX27iQaUIAPoAgCOT4+Fj++uuvnR8rCznXdWsPys6C0Pd9WSwWG/2IwjCUfr9fGIBRFK1squ2yxpUF9Pv373cabE3KU5frumKMKX0/C3dmhjRDAD6AxWIhX758edBjxnHcuIkVBIF4nrdxLaKqKbyqTFXBtM6A6GXLs1weS9YBU1d2f7XqArG3t7dxubQhAF+wde41bqOToqopnM1Bbnoc3/fl4uJi47I9FXUHtIv87PxYtX273W48FVM7eoGfmSa1oKy2tc5nNhWGYWGvcBiGjWd1ZIOgX8r9rawzrK6yzo9ls9ls52M+XxoC8Jm5urqqNfK/3W7nN9nr1rY8z1u5+kkTWVN4WZM5rNm84Zdyb6vVakmn02ncDK/7HTaZiw4C8NnJBlhXjenLlsrKmkLn5+fS7/crB0Nng6u3WcvKmsJv3ry583ocx5IkifR6vZVleknh53mevHv3rtH5NL1XyMyQZrgH+IS0Wi15+/Zt/m/btu/M+sjWnptMJuJ5nnQ6nXzsX7a9bdv3lphaLBb5Gn4iN7XIbOxg1mQyxtxZuul2U2q5HE1qL2EYyvHx8Z3pWyI/e6s9z8uHd9xe11DkZoDvY3ZY7O3trZx1k30nyyGfydYDbLVahesn3t7/8t85SZKNlhzDaq8ODw+vH7sQWN/t0Mx+jKvcDrin0COacV1XZrMZ69zhwRCAANTiHiAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGoRgADUIgABqEUAAlCLAASgFgEIQC0CEIBaBCAAtQhAAGr9P4qpAO1MdyY5AAAAAElFTkSuQmCC' }
+            ],
+            shaders: [],
+            fonts: []
+        }
+        Object.keys(this.config.globals).forEach(function(key) {
+            this.values[key] = this.config.globals[key].default
+        }.bind(this))
+        console.dir(this.values)
+
+        this.selectedObject = null
+        this.isDragging = false
+        this.dragType = 'move'
+        this.cursor = [ 0, 0 ]
+
+        updateElements() {
+            this.config.objects.forEach(function(obj) {
+                obj.updateElement()
+            })
+        }
+
+        //Navigation for the fake data
+        next_display() {
+            data.displayIndex = ( data.displayIndex < data.displays.length - 1 ) ? data.displayIndex + 1 : 0
+            data.listIndex = 0
+            console.log('next_display: ' + data.displayIndex )
+            this.updateElements()
+        }
+        prev_display() {
+            data.displayIndex = ( data.displayIndex > 0 ) ? data.displayIndex - 1 : data.displays.length - 1
+            data.listIndex = 0
+            console.log('prev_display: ' + data.displayIndex )
+            this.updateElements()
+        }
+        next_rom() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.listIndex = ( data.listIndex < currentDisplay.romlist.length - 1 ) ? data.listIndex + 1 : 0
+            console.log('next_rom: ' + data.listIndex )
+            this.updateElements()
+        }
+        prev_rom() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.listIndex = ( data.listIndex > 0 ) ? data.listIndex - 1 : currentDisplay.romlist.length - 1
+            console.log('prev_rom: ' + data.listIndex )
+            this.updateElements()
+        }
+
+        //add AM objects
+        addAMObject(obj) {
+            if ( !obj ) return
+            //console.log('adding object')
+            obj.id = this.idCounter
+            this.idCounter++
+            obj.label = obj.label || obj.type
+            this.config.objects.push( obj )
+
+            obj.createElement()
+            obj.el.setAttribute('data-id', obj.id)
+            obj.el.classList.add('object')
+            obj.updateElement()
+
+            var layoutCanvas = this.root.querySelector('.layout')
+            layoutCanvas.appendChild( obj.el )
+
+            this.select(obj.el)
+            this.trigger('object-added')
+        }
+
+        //delete AM objects
+        deleteObject(obj) {
+            if ( !obj ) return
+            this.config.objects.forEach(function(o, idx) {
+                if ( o.id == obj.id ) {
+                obj.el.parentNode.removeChild(obj.el)
+                    this.config.objects.splice(idx, 1)
+                    this.unselect()
+                    this.trigger('object-deleted')
+                }
+            }.bind(this))
+        }
+
+        //find object by its assigned id
+        findObjectById(id) {
+            var selected = null
+            this.config.objects.forEach(function(obj) {
+                if ( id == obj.id ) selected = obj
+            })
+            return selected
+        }
+
+        //find object by the element representing it
+        findObjectByEl(el) {
+            var selected = null
+            this.config.objects.forEach(function(obj) {
+                if ( el.getAttribute('data-id') == obj.id ) selected = obj
+            })
+            return selected
+        }
+        
+        //add new media to the layout
+        addMedia( mediaObj ) {
+            var found = false
+            this.config.media.forEach(function(item) {
+                if ( item.name == mediaObj.name ) found = true
+            })
+            if ( !found ) {
+                mediaObj.id = this.idCounterMedia
+                this.config.media.push(mediaObj)
+                this.idCounterMedia++
+                this.trigger('media-added')
+            }
+        }
+
+        //delete media from the layout
+        deleteMedia( obj ) {
+            if ( !obj ) return
+            this.config.media.forEach(function(media, idx) {
+                if ( obj.id == media.id ){
+                    this.config.media.splice(idx, 1)
+                    this.trigger('media-deleted')
+                }
+            }.bind(this))
+        }
+        
+        //find media by its assigned id
+        findMedia( search, key ) {
+            if ( key === undefined ) key = 'id'
+            var selected = null
+            this.config.media.forEach(function(media) {
+                if ( media[key] == search ) selected = media
+            })
+            return selected
+        }
+
+        //select an AM object element in the layout
+        select(el) {
+            this.unselect()
+            this.selectedObject = this.findObjectByEl(el)
+            if ( this.selectedObject ) {
+                this.selectedObject.el.classList.add('selected')
+                this.selectedObject.el.onmousedown = this.startDrag
+                this.trigger('object-selected')
+            }
+        }
+
+        //deselect an AM object element in the layout
+        unselect() {
+            if ( this.selectedObject ) {
+                this.selectedObject.el.classList.remove('selected')
+                this.selectedObject.el.onmousedown = function() {}
+            }
+            this.selectedObject = null
+            this.trigger('object-deselected')
+        }
+
+        getElementTop(el) {
+            var yPos = el.offsetTop
+            var parentEl = el.offsetParent
+            while ( parentEl != null ) {
+                yPos += parentEl.offsetTop
+                parentEl = parentEl.offsetParent
+            }
+            return yPos
+        }
+
+        getElementLeft(el) {
+            var xPos = el.offsetLeft
+            var parentEl = el.offsetParent
+            while ( parentEl != null ) {
+                xPos += parentEl.offsetLeft
+                parentEl = parentEl.offsetParent
+            }
+            return xPos
+        }
+
+        this.on('mount', function() {
+            this.root.onmousedown = function(e) {
+                this.select(e.target)
+            }.bind(this)
+            
+            this.root.onmousemove = function(e) {
+                this.cursor[0] = e.clientX //?? * (this.config.editor.zoom / 100)
+                this.cursor[1] = e.clientY //?? * (this.config.editor.zoom / 100)
+                this.trigger('cursor-move')
+                var selected = this.selectedObject
+                if ( selected && this.isDragging ) {
+                    switch( this.dragType ) {
+                        case 'resizeTL':
+                            selected.values.x += e.movementX
+                            selected.el.style.left = selected.values.x + 'px'
+                            selected.values.width -= e.movementX
+                            selected.el.style.width = selected.values.width + 'px'
+                            selected.values.y += e.movementY
+                            selected.el.style.top = selected.values.y + 'px'
+                            selected.values.height -= e.movementY
+                            selected.el.style.height = selected.values.height + 'px'
+                            selected.el.style.cursor = 'nwse-resize'
+                            break
+                        case 'resizeTR':
+                            selected.values.y += e.movementY
+                            selected.el.style.top = selected.values.y + 'px'
+                            selected.values.height -= e.movementY
+                            selected.el.style.height = selected.values.height + 'px'
+                            selected.values.width += e.movementX
+                            selected.el.style.width = selected.values.width + 'px'
+                            selected.el.style.cursor = 'nesw-resize'
+                            break
+                        case 'resizeBR':
+                            selected.values.width += e.movementX
+                            selected.values.height += e.movementY
+                            selected.el.style.width = selected.values.width + 'px'
+                            selected.el.style.height = selected.values.height + 'px'
+                            selected.el.style.cursor = 'nwse-resize'
+                            break
+                        case 'resizeBL':
+                            selected.values.x += e.movementX
+                            selected.el.style.left = selected.values.x + 'px'
+                            selected.values.width -= e.movementX
+                            selected.el.style.width = selected.values.width + 'px'
+                            selected.values.height += e.movementY
+                            selected.el.style.height = selected.values.height + 'px'
+                            break
+                        case 'resizeT':
+                            selected.values.y += e.movementY
+                            selected.el.style.top = selected.values.y + 'px'
+                            selected.values.height -= e.movementY
+                            selected.el.style.height = selected.values.height + 'px'
+                            break
+                        case 'resizeR':
+                            selected.values.width += e.movementX
+                            selected.el.style.width = selected.values.width + 'px'
+                            selected.el.style.cursor = 'ew-resize'
+                            break
+                        case 'resizeB':
+                            selected.values.height += e.movementY
+                            selected.el.style.height = selected.values.height + 'px'
+                            selected.el.style.cursor = 'ns-resize'
+                            break
+                        case 'resizeL':
+                            selected.values.x += e.movementX
+                            selected.el.style.left = selected.values.x + 'px'
+                            selected.values.width -= e.movementX
+                            selected.el.style.width = selected.values.width + 'px'
+                            break
+                        case 'move':
+                            selected.values.x += e.movementX
+                            selected.values.y += e.movementY
+                            selected.el.style.left = selected.values.x + 'px'
+                            selected.el.style.top = selected.values.y + 'px'
+                            break
+                    }
+                    this.trigger('object-update')
+                } else if ( selected && !this.isDragging ) {
+                    if ( selected.locked ) {
+                        selected.el.style.cursor = 'default'
+                    } else {
+                        //setup drag resizing or movement
+                        //var objLeft = .parentElement.offsetLeft + selected.el.offsetLeft
+                        var objLeft = this.getElementLeft(selected.el)
+                        var objRight = objLeft + selected.values.width
+                        var objTop = this.getElementTop(selected.el)
+                        //var objTop = selected.el.parentElement.offsetTop + selected.el.offsetTop
+                        var objBottom = objTop + selected.values.height
+                        barBottom.setMessage(3, 'selected rect x: ' + objLeft + '-' + objRight + 'y: ' + objTop + '-' + objBottom)
+                        if ( e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 && e.clientY >= objTop - 3 && e.clientY <= objTop + 3) {
+                            selected.el.style.cursor = 'nwse-resize'
+                            this.dragType = 'resizeTL'
+                        } else if ( e.clientY >= objTop - 3 && e.clientY <= objTop + 3 && e.clientX >= objRight - 3 && e.clientX <= objRight + 3) {
+                            selected.el.style.cursor = 'nesw-resize'
+                            this.dragType = 'resizeTR'
+                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 && e.clientX >= objRight - 3 && e.clientX <= objRight + 3 ) {
+                            selected.el.style.cursor = 'nwse-resize'
+                            this.dragType = 'resizeBR'
+                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 && e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 ) {
+                            selected.el.style.cursor = 'nesw-resize'
+                            this.dragType = 'resizeBL'
+                        } else if ( e.clientY >= objTop - 3 && e.clientY <= objTop + 3 ) {
+                            selected.el.style.cursor = 'ns-resize'
+                            this.dragType = 'resizeT'
+                        } else if ( e.clientX >= objRight - 3 && e.clientX <= objRight + 3 ) {
+                            selected.el.style.cursor = 'ew-resize'
+                            this.dragType = 'resizeR'
+                        } else if ( e.clientY >= objBottom - 3 && e.clientY <= objBottom + 3 ) {
+                            selected.el.style.cursor = 'ns-resize'
+                            this.dragType = 'resizeB'
+                        } else if ( e.clientX >= objLeft - 3 && e.clientX <= objLeft + 3 ) {
+                            selected.el.style.cursor = 'ew-resize'
+                            this.dragType = 'resizeL'
+                        } else {
+                            selected.el.style.cursor = 'move'
+                            this.dragType = 'move'
+                        }
+                    }
+                }
+            }.bind(this)
+        })
+
+        //create a zipfile of the layout contents, and prompt the user to save it
+        createZip() {
+            var zip = new JSZip()
+            zip.file('layout.nut', this.generateCode())
+            var resources = zip.folder('resources')
+            this.config.media.forEach(function(media) {
+                resources.file( media.name, media.data.replace('data:image/png;base64,', ''), { base64: true } )
+            })
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                showModal('<p>Your download is complete.Enjoy!</p><button onclick="closeModal()">Close</button>')
+                saveAs(content, "example.zip");
+                //<a href="data:application/zip;base64,' + content + '">Download now</a>
+            })
+        }
+
+        //generates the squirrel code needed for AM layouts
+        generateCode() {
+            //save current aspect
+            this.updateAspect(this.aspect)
+
+            var code =  ''
+            code += '///////////////////////////////////////\n'
+            code += '// Generated with AMBuilder 1.0\n'
+            code += '// https://github.com/liquid8d/attract-extra/am-builder\n'
+            code += '///////////////////////////////////////\n'
+            code += '\n'
+            code += '//layout configuration\n'
+            code += 'fe.layout.width = ' + this.values.width + '\n'
+            code += 'fe.layout.height = ' + this.values.height + '\n'
+            code += 'fe.layout.font = "' + this.values.font + '"\n'
+            code += 'fe.layout.base_rotation = ' + this.values.base_rotation + '\n'
+            code += 'fe.layout.toggle_rotation = ' + this.values.toggle_rotation + '\n'
+            code += 'fe.layout.page_size = ' + this.values.page_size + '\n'
+            code += 'fe.layout.preserve_aspect_ratio = ' + this.values.preserve_aspect_ratio + '\n'
+            code += '\n'
+            code += '//stored aspect values\n'
+            code += 'local aspect = "Standard (4x3)"\n'
+            //write out properties for all aspects
+            code += 'local props = {\n'
+            var availableAspects = []
+            Object.keys(this.config.objects[0].aspect_values).forEach(function(key) {
+                availableAspects.push(key)
+            })
+            availableAspects.forEach(function(aspect, idx) {
+                code += '   "' + aspect + '": {\n'
+                var objCount = 0
+                this.config.objects.forEach(function(obj) {
+                    if ( obj.aspect_values[aspect] ) {
+                        objCount++
+                        var objId = obj.type + obj.id
+                        //we have to convert constant strings to constants here
+                        code += '      "' + objId + '":' + JSON.stringify(obj.aspect_values[aspect])
+                            .replace('"Align.Left"', 'Align.Left')
+                            .replace('"Align.Centre"', 'Align.Centre')
+                            .replace('"Align.Left"', 'Align.Right')
+                            .replace('"Style.Regular"', 'Style.Regular')
+                            .replace('"Style.Bold"', 'Style.Bold')
+                            .replace('"Style.Left"', 'Style.Italic')
+                        code += ( objCount < this.config.objects.length ) ? ',\n' : '\n'
+                    }
+                }.bind(this))
+                console.log(idx)
+                code += ( idx < availableAspects.length -1 ) ? '   },\n' : '   }\n'
+            }.bind(this))
+            code += '}\n\n'
+            //write out object code
+            this.config.objects.forEach(function(obj) {
+                var objId = obj.type + obj.id
+                var objCode = utils.replaceAll(obj.toSquirrel(), '[object]', objId )
+                objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
+                code += objCode + '\n'
+            }.bind(this))
+            return code
+        }
+
+        //save current object aspect settings and switch to a new one
+        updateAspect(aspect) {
+            var layout = this.root.querySelector('.layout')
+            switch (aspect) {
+                case 'Standard (4x3)':
+                    layout.style.width = '640px'
+                    layout.style.height = '480px'
+                    break
+                case 'Standard Vert (3x4)':
+                    layout.style.width = '480px'
+                    layout.style.height = '640px'
+                    break
+                case 'Wide (16x10)':
+                    layout.style.width = '1280px'
+                    layout.style.height = '800px'
+                    break
+                case 'Wide Vert (10x16)':
+                    layout.style.width = '800px'
+                    layout.style.height = '1280px'
+                    break
+                case 'HD (16x9)':
+                    layout.style.width = '1024px'
+                    layout.style.height = '576px'
+                    break
+                case 'HD Vert (9x16)':
+                    layout.style.width = '576px'
+                    layout.style.height = '1024px'
+                    break
+            }
+            console.log( 'switch from ' + this.aspect + ' to ' + aspect )
+            this.config.objects.forEach(function(obj) {
+                //store current aspect values
+                obj.aspect_values[this.aspect] = JSON.parse(JSON.stringify(obj.values))
+                if ( obj.aspect_values[aspect] ) obj.values = JSON.parse(JSON.stringify(obj.aspect_values[aspect]))
+                obj.updateElement()
+            }.bind(this))
+            this.aspect = aspect
+            this.trigger('object-update')
+        }
+
+        setZoom(per) {
+            var layout = this.root.querySelector('.layout')
+            layout.style.zoom = per + '%'
+            this.config.editor.zoom = per
+        }
+
+        deleteSelected() {
+            this.deleteObject(this.selectedObject)
+        }
+
+        startDrag(e) {
+            if ( !this.selectedObject.locked ) {
+                //console.log('start drag ' + this.dragType)
+                this.root.onmouseup = function(e) {
+                    //stop drag
+                    this.isDragging = false
+                }.bind(this)
+                this.isDragging = true
+                e.stopPropagation()
+            }
+        }
+
+    </script>
+</layout>

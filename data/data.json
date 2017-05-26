@@ -1,0 +1,42 @@
+{
+    "displayIndex": 0,
+    "listIndex": 0,
+    "displays": [
+        {
+            "name": "mame",
+            "label": "Arcade",
+            "romlist": [
+                {"Name":"kinst","Title":"Killer Instinct (v1.5d)","Emulator":"mame","CloneOf":"","Year":1994,"Manufacturer":"Rare","Category":"Fighter / Versus","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"chd","Buttons":6},
+                {"Name":"mvsc","Title":"Marvel Vs. Capcom: Clash of Super Heroes (Euro 980123)","Emulator":"mame","CloneOf":"","Year":1998,"Manufacturer":"Capcom","Category":"Fighter / Versus","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":6},
+                {"Name":"mslugx","Title":"Metal Slug X - Super Vehicle-001 (NGM-2500)(NGH-2500)","Emulator":"mame","CloneOf":"","Year":1999,"Manufacturer":"SNK","Category":"Platform / Shooter Scrolling","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"neogeo","AltTitle":"","Extra":"","Buttons":4},
+                {"Name":"mk","Title":"Mortal Kombat (rev 5.0 T-Unit 03/19/93)","Emulator":"mame","CloneOf":"","Year":1992,"Manufacturer":"Midway","Category":"Fighter / Versus","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":6},
+                {"Name":"mrdrillr","Title":"Mr. Driller (US, DRI3/VER.A2)","Emulator":"mame","CloneOf":"","Year":1999,"Manufacturer":"Namco","Category":"Puzzle / Misc.","Players":"1P","Rotation":0,"Control":"joystick (4-way)","Status":"imperfect","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":6},
+                {"Name":"sf2","Title":"Street Fighter II: The World Warrior (World 910522)","Emulator":"mame","CloneOf":"","Year":1991,"Manufacturer":"Capcom","Category":"Fighter / Versus","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":6},
+                {"Name":"spf2t","Title":"Super Puzzle Fighter II Turbo (Euro 960529)","Emulator":"mame","CloneOf":"","Year":1996,"Manufacturer":"Capcom","Category":"Puzzle / Drop","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":2}
+            ],
+            "favs": [ "kinst", "msvc", "mslugx", "mk", "mrdrillr", "sf2", "spf2t" ],
+            "filter": "favs"
+        },
+        {
+            "name": "snes",
+            "label": "Super Nintendo",
+            "romlist": [
+                {"Name":"Breath of Fire II (USA)","Title":"Breath of Fire II (USA)","Emulator":"zsnes","CloneOf":"","Year":1995,"Manufacturer":"Capcom","Category":"Role-Playing","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Castlevania - Dracula X (USA)","Title":"Castlevania - Dracula X (USA)","Emulator":"zsnes","CloneOf":"","Year":1995,"Manufacturer":"Konami","Category":"Action / Platform","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Chrono Trigger (USA)","Title":"Chrono Trigger (USA)","Emulator":"zsnes","CloneOf":"","Year":1995,"Manufacturer":"Squaresoft","Category":"Role-Playing","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Contra III - The Alien Wars (USA)","Title":"Contra III - The Alien Wars (USA)","Emulator":"zsnes","CloneOf":"","Year":1992,"Manufacturer":"Konami","Category":"Action / Shooter","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Donkey Kong Country (USA)","Title":"Donkey Kong Country (USA)","Emulator":"zsnes","CloneOf":"","Year":1994,"Manufacturer":"Nintendo","Category":"Action / Adventure / Platform","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Earthworm Jim (USA)","Title":"Earthworm Jim (USA)","Emulator":"zsnes","CloneOf":"","Year":1994,"Manufacturer":"Playmates Interactive Entertainment, Inc.","Category":"Action / Adventure / Platform","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Legend of Zelda, The - A Link to the Past (USA)","Title":"Legend of Zelda, The - A Link to the Past (USA)","Emulator":"zsnes","CloneOf":"","Year":1992,"Manufacturer":"Nintendo","Category":"Action / Adventure / Role-Playing","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Secret of Mana (USA)","Title":"Secret of Mana (USA)","Emulator":"zsnes","CloneOf":"","Year":1993,"Manufacturer":"Squaresoft","Category":"Action / Role-Playing","Players":3,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Super Castlevania IV (USA)","Title":"Super Castlevania IV (USA)","Emulator":"zsnes","CloneOf":"","Year":1991,"Manufacturer":"Konami","Category":"Action / Platform","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Super Mario Kart (USA)","Title":"Super Mario Kart (USA)","Emulator":"zsnes","CloneOf":"","Year":1992,"Manufacturer":"Nintendo","Category":"Racing","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Super Mario RPG - Legend of the Seven Stars (USA)","Title":"Super Mario RPG - Legend of the Seven Stars (USA)","Emulator":"zsnes","CloneOf":"","Year":1996,"Manufacturer":"Nintendo","Category":"Role-Playing","Players":1,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Super Mario World (USA)","Title":"Super Mario World (USA)","Emulator":"zsnes","CloneOf":"","Year":1990,"Manufacturer":"Nintendo","Category":"Platform","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
+                {"Name":"Teenage Mutant Ninja Turtles IV - Turtles in Time (USA)","Title":"Teenage Mutant Ninja Turtles IV - Turtles in Time (USA)","Emulator":"zsnes","CloneOf":"","Year":1992,"Manufacturer":"Konami","Category":"Action","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""}
+            ],
+            "favs": [],
+            "filter": "favs"
+        }
+    ]
+}

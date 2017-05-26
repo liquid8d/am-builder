@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- framework -->
+        <script src="js/riot-with-compiler.min.js"></script>
+        <script src="js/riot-mixin-utils.js"></script>
+        <script src="js/jszip.min.js"></script>
+        <script src="js/FileSaver.min.js"></script>
+        <script>
+            var utils = riot.mixin('utils')
+        </script>
+        <script src="js/am-object.js"></script>
+        <script src="js/am-text.js"></script>
+        <script src="js/am-image.js"></script>
+        <script src="js/am-listbox.js"></script>
+        <script src="tags/layout.tag" type="riot/tag"></script>
+        <script src="tags/menu.tag" type="riot/tag"></script>
+        <script src="tags/menu-tools.tag" type="riot/tag"></script>
+        <script src="tags/menu-layout.tag" type="riot/tag"></script>
+        <script src="tags/menu-props.tag" type="riot/tag"></script>
+        <script src="tags/menu-objects.tag" type="riot/tag"></script>
+        <script src="tags/menu-data.tag" type="riot/tag"></script>
+        <script src="tags/menu-events.tag" type="riot/tag"></script>
+        <script src="tags/menu-media.tag" type="riot/tag"></script>
+        <script src="tags/bar-top.tag" type="riot/tag"></script>
+        <script src="tags/bar-bottom.tag" type="riot/tag"></script>
+        <link href="css/style.css" rel="stylesheet"></link>
+        <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet">
+    </head>
+    <body>
+        <div class="workspace no-select">
+            <!-- top toolbar -->
+            <bar-top class="horizontal-toolbar top"></bar-top>
+            <div class="main">
+                <menu></menu>
+                <layout></layout>
+            </div>
+            <!-- dev toolbar(s) -->
+            <div class="horizontal-toolbar bottom">
+                <span>Dev
+                <button onclick="console.dir(layout)">Layout</button>
+                <button onclick="console.table(data.displays)">Displays</button>
+                <button onclick="console.table(data.displays[data.displayIndex].romlist)">CurrentList</button>
+                <button onclick="console.table(layout.config.media)">Media</button>
+                <button onclick="console.dir(layout.selectedObject)">Object Vals</button>
+            </div>
+            <!-- bottom toolbar -->
+            <bar-bottom class="horizontal-toolbar bottom"></bar-bottom>
+        </div>
+        <div class="modal">
+            <div class="content"></div>
+        </div>
+        <script>
+            //load sample data
+            var data = {}
+            utils.fetch('data/data.json', {
+                json: true,
+                complete: function(response) {
+                    data = response.data
+                    console.log('loaded data')
+                }
+            })
+
+            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuEvents, menuMedia
+            riot.compile(function() {
+                //setup menu
+                menu = riot.mount('menu')[0]
+                menu.setMenu({
+                    accordian: false,
+                    items: [
+                        { label: 'Tools', content: '<menu-tools></menu-tools>' },
+                        { label: 'Objects', expand: true, foldable: true, maxHeight: '160px', content: '<menu-objects></menu-objects>' },
+                        { label: 'Properties', expand: false, foldable: true, minHeight: '192px', maxHeight: '240px', content: '<menu-props></menu-props>' },
+                        { label: 'Media', foldable: true, content: '<menu-media></menu-media>'},
+                        { label: 'Data', foldable: true, content: '<menu-data></menu-data>' },
+                        { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
+                        { label: 'Shaders', foldable: true, content: '<p>Shaders placeholder</p>' },
+                        { label: 'Fonts', foldable: true, content: '<p>Fonts placeholder</p>' },
+                        { label: 'Events', foldable: true, content: '<menu-events></menu-events>' },
+                    ]
+                })
+                //mount menu components
+                menuTools = riot.mount('menu-tools')[0]
+                menuLayout = riot.mount('menu-layout')[0]
+                menuProps = riot.mount('menu-props')[0]
+                menuObjects = riot.mount('menu-objects')[0]
+                menuData = riot.mount('menu-data')[0]
+                menuEvents = riot.mount('menu-events')[0]
+                menuMedia = riot.mount('menu-media')[0]
+                barTop = riot.mount('bar-top')[0]
+                barBottom = riot.mount('bar-bottom')[0]
+
+                //mount layout and hook components to the layout
+                layout = riot.mount('layout')[0]
+                barTop.setLayout(layout)
+                barBottom.setLayout(layout)
+                menuLayout.setLayout(layout)
+                menuProps.setLayout(layout)
+                menuObjects.setLayout(layout)
+                menuMedia.setLayout(layout)
+                menuData.setLayout(layout)
+            })
+
+            function showModal(html) {
+                document.querySelector('.modal').style.display = 'block'
+                document.querySelector('.modal .content').innerHTML = html
+            }
+
+            function closeModal() {
+                document.querySelector('.modal').style.display = 'none'
+            }
+        </script>
+    </body>
+</html>

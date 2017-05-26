@@ -1,0 +1,7 @@
+{
+    "name": "AMBuild",
+    "author": "",
+    "scripts": {
+        "start": "electron ."
+    }
+}
