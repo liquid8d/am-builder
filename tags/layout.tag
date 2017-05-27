@@ -281,7 +281,6 @@
                 }.bind(this))
                 .on('resizemove', function(event) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                    console.log('interact resize')
                     var target = event.target,
                         x = (parseFloat(target.getAttribute('data-x')) || 0),
                         y = (parseFloat(target.getAttribute('data-y')) || 0);
@@ -305,9 +304,6 @@
                     this.selectedObject.values.height = event.rect.height
                     this.trigger('object-update')
                 }.bind(this))
-
-            console.dir(interact)
-            console.dir(interact('.object'))
         })
 
         //create a zipfile of the layout contents, and prompt the user to save it
