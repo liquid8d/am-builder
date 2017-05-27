@@ -259,12 +259,12 @@
                         endOnly: true,
                         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
                     },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity, relativePoints: [ { x: 0, y: 0 } ] }
+                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
                 })
                 .resizable({
                     preserveAspectRatio: false,
                     edges: { left: true, right: true, bottom: true, top: true },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity, relativePoints: [ { x: 0, y: 0 } ] }
+                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
                 })
                 .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
                 .on('dragmove', function(event) {
@@ -305,6 +305,9 @@
                     this.selectedObject.values.height = event.rect.height
                     this.trigger('object-update')
                 }.bind(this))
+
+            console.dir(interact)
+            console.dir(interact('.object'))
         })
 
         //create a zipfile of the layout contents, and prompt the user to save it
