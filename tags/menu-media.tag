@@ -2,7 +2,7 @@
     <style scoped>
         .list .item { cursor: pointer; }
         .list .item span { flex-grow: 1; overflow: hidden; pointer-events: none; }
-        .preview { border: 1px solid rgb(20,20,20); width: 100%; height: 64px; background-size: cover; margin-bottom: 7px; }
+        .preview { border: 1px solid rgb(25,25,25); width: 100%; height: 64px; background-size: cover; margin: 7px 0 7px 0; }
         .dropzone { padding: 5px; border: 1px dashed #555; }
         .dropzone.over { border: 1px dashed #999933 }
         input[type='file'] { margin-top: 7px; }
