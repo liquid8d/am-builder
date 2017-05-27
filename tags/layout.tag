@@ -315,8 +315,8 @@
                 resources.file( media.name, media.data.replace('data:image/png;base64,', ''), { base64: true } )
             })
             zip.generateAsync({ type: 'blob' }).then(function(content) {
-                showModal('<p>Your download is complete.Enjoy!</p><button onclick="closeModal()">Close</button>')
-                saveAs(content, "example.zip");
+                showModal('<p>Your download has started. Enjoy!</p><button onclick="closeModal()">Close</button>')
+                saveAs(content, "ambuilder.zip");
                 //<a href="data:application/zip;base64,' + content + '">Download now</a>
             })
         }
