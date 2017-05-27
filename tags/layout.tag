@@ -316,7 +316,7 @@
             })
             zip.generateAsync({ type: 'blob' }).then(function(content) {
                 showModal('<p>Your download has started. Enjoy!</p><button onclick="closeModal()">Close</button>')
-                saveAs(content, "ambuilder.zip");
+                saveAs(content, "am-builder.zip")
                 //<a href="data:application/zip;base64,' + content + '">Download now</a>
             })
         }
