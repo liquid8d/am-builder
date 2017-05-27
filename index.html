@@ -23,7 +23,7 @@
         <script src="tags/menu-props.tag" type="riot/tag"></script>
         <script src="tags/menu-objects.tag" type="riot/tag"></script>
         <script src="tags/menu-data.tag" type="riot/tag"></script>
-        <script src="tags/menu-events.tag" type="riot/tag"></script>
+        <script src="tags/menu-triggers.tag" type="riot/tag"></script>
         <script src="tags/menu-media.tag" type="riot/tag"></script>
         <script src="tags/bar-top.tag" type="riot/tag"></script>
         <script src="tags/bar-bottom.tag" type="riot/tag"></script>
@@ -66,7 +66,7 @@
                 }
             })
 
-            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuEvents, menuMedia
+            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia
             riot.compile(function() {
                 //setup menu
                 menu = riot.mount('menu')[0]
@@ -79,9 +79,9 @@
                         { label: 'Media', foldable: true, content: '<menu-media></menu-media>'},
                         { label: 'Data', foldable: true, content: '<menu-data></menu-data>' },
                         { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
+                        { label: 'Triggers', foldable: true, content: '<menu-triggers></menu-triggers>' },
                         { label: 'Shaders', foldable: true, content: '<p>Shaders placeholder</p>' },
                         { label: 'Fonts', foldable: true, content: '<p>Fonts placeholder</p>' },
-                        { label: 'Events', foldable: true, content: '<menu-events></menu-events>' },
                     ]
                 })
                 //mount menu components
@@ -90,7 +90,7 @@
                 menuProps = riot.mount('menu-props')[0]
                 menuObjects = riot.mount('menu-objects')[0]
                 menuData = riot.mount('menu-data')[0]
-                menuEvents = riot.mount('menu-events')[0]
+                menuTriggers = riot.mount('menu-triggers')[0]
                 menuMedia = riot.mount('menu-media')[0]
                 barTop = riot.mount('bar-top')[0]
                 barBottom = riot.mount('bar-bottom')[0]
