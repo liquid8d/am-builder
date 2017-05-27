@@ -329,7 +329,7 @@
             var code =  ''
             code += '///////////////////////////////////////\n'
             code += '// Generated with AMBuilder 1.0\n'
-            code += '// https://github.com/liquid8d/attract-extra/am-builder\n'
+            code += '// https://github.com/liquid8d/am-builder\n'
             code += '///////////////////////////////////////\n'
             code += '\n'
             code += '//layout configuration\n'
