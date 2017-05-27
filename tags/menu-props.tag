@@ -28,6 +28,9 @@
             </div>
         </div>
     </div>
+    <div if="{ !showProps() }">
+        <span>Click an object in the layout or in the objects list to view its properties</span>
+    </div>
     <script>
         this.layout = null  //currently attached layout
         
