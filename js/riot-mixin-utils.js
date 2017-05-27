@@ -87,7 +87,8 @@ riot.mixin('utils', {
         var currentDisplay = data.displays[data.displayIndex]
         var currentFilter = currentDisplay.filters[data.filterIndex]
         var currentRom = currentDisplay.romlist[ utils.getAdjustedIndex(index_offset) ]
-        var currentStats = ( currentRom ) ? currentDisplay.stats[currentRom.Name] : {}
+        //var currentStats = ( currentRom ) ? currentDisplay.stats[currentRom.Name] : { "PlayedTime": 0, "PlayedCount": 0 }
+        var currentStats = { "PlayedTime": 5423, "PlayedCount": 27 }
         return text.replace('[DisplayName]', currentDisplay.name)
                     .replace('[ListSize]', currentDisplay.romlist.length )
                     .replace('[ListEntry]', data.listIndex )
@@ -109,8 +110,8 @@ riot.mixin('utils', {
                     .replace('[DisplayType]', currentRom.DisplayType )
                     .replace('[AltRomname]', currentRom.AltRomname )
                     .replace('[AltTitle]', currentRom.AltTitle )
-                    .replace('[PlayedTime]', currentStats.PlayedTime || 0 )
-                    .replace('[PlayedCount]', currentStats.PlayedCount || 0 )
+                    .replace('[PlayedTime]', currentStats.PlayedTime )
+                    .replace('[PlayedCount]', currentStats.PlayedCount )
                     .replace('[SortValue]', currentDisplay.SortValue )
                     .replace('[System]', data.emulators[currentRom.Emulator].System )
                     .replace('[SystemN]', data.emulators[currentRom.Emulator].System )
