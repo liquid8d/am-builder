@@ -1,4 +1,26 @@
 riot.mixin('utils', {
+    //this allows you to colorize images with rgb values by adding filter: url(#idFromHere) to the image
+    createFilterColor: function( id, r, g, b) {
+        var svg = document.getElementById('color-filter') || document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        svg.id = 'color-filter'
+        svg.classList.add('defs-only')
+        document.body.appendChild(svg)
+        if ( !svg ) return
+        //r 0 0 0 0 0 g 0 0 0 0 0 b 0 0 0 0 0 1 0
+        var color = r + ' 0 0 0 0 0 ' + g + ' 0 0 0 0 0 ' + b + ' 0 0 0 0 0' + ' 1 0'
+        var filter = svg.querySelector('filter') || document.createElementNS('http://www.w3.org/2000/svg', 'filter')
+            filter.id = id
+            filter.setAttribute( 'color-interpolation-filters', 'sRGB')
+            filter.setAttribute( 'x', 0 )
+            filter.setAttribute( 'y', 0 )
+            filter.setAttribute( 'width', '100%' )
+            filter.setAttribute( 'height', '100%' )
+            var matrix = filter.querySelector('feColorMatrix') || document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix')
+            matrix.setAttribute( 'type', 'matrix' )
+            matrix.setAttribute( 'values', color )
+            filter.appendChild(matrix)
+        svg.appendChild(filter)
+    },
     fetch: function(url, opts) {
         if (!url) return
         opts.url = url

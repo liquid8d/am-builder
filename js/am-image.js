@@ -70,6 +70,14 @@ function AMImage(file_name,x, y, width, height, artwork) {
             url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
         }
         this.el.style.backgroundImage = 'url(\'' + url + '\')'
+        
+        //colorize image with svg filter
+        var red = (this.values.red / 255 ) || 0
+        var green = ( this.values.green / 255 ) || 0
+        var blue = ( this.values.blue / 255 ) || 0
+        riot.mixin('utils').createFilterColor('object-filter-' + this.id, red, green, blue)
+        this.el.style.filter = 'url(\'#object-filter-' + this.id + '\')'
+        
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.opacity = alpha
         if ( this.values.preserve_aspect_ratio ) {
