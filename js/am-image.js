@@ -39,7 +39,6 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.createElement = function() {
         this.el = document.createElement('div')
-        this.el.style.cursor = 'default'
         this.el.classList.add('image')
         this.el.style.backgroundRepeat = 'no-repeat'
 

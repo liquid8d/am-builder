@@ -35,7 +35,6 @@
 
         .object {
             position: absolute;
-            cursor: pointer;
         }
         .object.image {
             background-size: contain;

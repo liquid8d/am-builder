@@ -36,7 +36,6 @@ function AMListBox(x, y, width, height) {
 
     this.createElement = function() {
         this.el = document.createElement('ul')
-        this.el.style.cursor = 'default'
         this.el.classList.add('listbox')
         this.el.style.listStyle = 'none'
         this.el.whiteSpace = 'nowrap'
