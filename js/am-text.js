@@ -52,7 +52,7 @@ function AMText(x, y, width, height) {
         this.el.style.textAlign = ( this.values.align == 'Align.Centre' ) ? 'center' : ( this.values.align == 'Align.Right' ) ? 'right' : 'left'
         this.el.style.fontFamily = this.values.font
         this.el.style.fontSize = ( this.values.charsize != -1 ) ? this.values.charsize + 'px' : '100vh'
-        this.el.style.zIndex = this.values.zorder
+        if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         this.el.style.whiteSpace = ( this.values.word_wrap ) ? 'normal' : 'nowrap'
         if ( this.values.style.indexOf('Style.Bold') > -1 ) this.el.style.fontWeight = 'bold'
         if ( this.values.style.indexOf('Style.Italic') > -1 ) this.el.style.fontStyle = 'italic'
@@ -66,11 +66,14 @@ function AMText(x, y, width, height) {
             code += 'local [object] = fe.add_text( "' + this.values.msg + '", -1, -1, 1, 1 )' + '\n'
             Object.keys(this.props).forEach(function(key) {
                 switch(key) {
+                    case 'zorder':
+                        if ( this.values.zorder >= 0 ) code += '   [object].' + key + ' = [props].' + key + '\n'
+                        break
                     default:
                        code += '   [object].' + key + ' = [props].' + key + '\n'
                        break
                 }
-            })
+            }.bind(this))
         return code
     }
 }

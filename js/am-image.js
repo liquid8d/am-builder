@@ -59,7 +59,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.height = ( this.values.height  ) ? this.values.height + 'px' : 'auto'
         this.el.style.display = ( this.values.visible ) ? 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
-        this.el.style.zIndex = this.values.zorder
+        if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
         var media = layout.findMedia(this.values.file_name, 'name')
         var url = ( media ) ? media.data : ''
@@ -108,11 +108,14 @@ function AMImage(file_name,x, y, width, height, artwork) {
                     case 'trigger':
                         //don't use yet
                         break
+                    case 'zorder':
+                        if ( this.values.zorder >= 0 ) code += '   [object].' + key + ' = [props].' + key + '\n'
+                        break
                     default:
                        code += '   [object].' + key + ' = [props].' + key + '\n'
                        break
                 }
-            })
+            }.bind(this))
         return code
     }
 }
