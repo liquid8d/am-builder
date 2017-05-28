@@ -13,6 +13,28 @@ riot.mixin('utils', {
         console.dir(val)
         return val
     },
+    //this allows you to colorize images with rgb values by adding filter: url(#idFromHere) to the image
+    createFilterColor: function( id, r, g, b) {
+        var svg = document.getElementById('color-filter') || document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        svg.id = 'color-filter'
+        svg.classList.add('defs-only')
+        document.body.appendChild(svg)
+        if ( !svg ) return
+        //r 0 0 0 0 0 g 0 0 0 0 0 b 0 0 0 0 0 1 0
+        var color = r + ' 0 0 0 0 0 ' + g + ' 0 0 0 0 0 ' + b + ' 0 0 0 0 0' + ' 1 0'
+        var filter = svg.querySelector('filter') || document.createElementNS('http://www.w3.org/2000/svg', 'filter')
+            filter.id = id
+            filter.setAttribute( 'color-interpolation-filters', 'sRGB')
+            filter.setAttribute( 'x', 0 )
+            filter.setAttribute( 'y', 0 )
+            filter.setAttribute( 'width', '100%' )
+            filter.setAttribute( 'height', '100%' )
+            var matrix = filter.querySelector('feColorMatrix') || document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix')
+            matrix.setAttribute( 'type', 'matrix' )
+            matrix.setAttribute( 'values', color )
+            filter.appendChild(matrix)
+        svg.appendChild(filter)
+    },
     fetch: function(url, opts) {
         if (!url) return
         opts.url = url
@@ -77,18 +99,37 @@ riot.mixin('utils', {
         if ( index_offset == undefined ) index_offset = 0
         if ( !data ) return text
         var currentDisplay = data.displays[data.displayIndex]
+        var currentFilter = currentDisplay.filters[data.filterIndex]
         var currentRom = currentDisplay.romlist[ utils.getAdjustedIndex(index_offset) ]
-        return text.replace('[Title]', currentRom.Title)
-                   .replace('[ListSize]', currentDisplay.romlist.length )
-                   .replace('[ListEntry]', data.listIndex )
-                   .replace('[Emulator]', currentRom.Emulator )
-                   .replace('[Name]', currentRom.Name )
-                   .replace('[Year]', currentRom.Year )
-                   .replace('[CloneOf]', currentRom.CloneOf )
-                   .replace('[Manufacturer]', currentRom.Manufacturer )
-                   .replace('[Category]', currentRom.Category )
-                   .replace('[Players]', currentRom.Players )
-                   .replace('[Rotation]', currentRom.Rotation )
+        //var currentStats = ( currentRom ) ? currentDisplay.stats[currentRom.Name] : { "PlayedTime": 0, "PlayedCount": 0 }
+        var currentStats = { "PlayedTime": 5423, "PlayedCount": 27 }
+        return text.replace('[DisplayName]', currentDisplay.name)
+                    .replace('[ListSize]', currentDisplay.romlist.length )
+                    .replace('[ListEntry]', data.listIndex )
+                    .replace('[FilterName]', currentFilter.name )
+                    .replace('[Search]', currentDisplay.Search )
+                    .replace('[SortName]', currentDisplay.SortName )
+                    .replace('[Name]', currentRom.Name )
+                    .replace('[Title]', currentRom.Title)
+                    .replace('[Emulator]', currentRom.Emulator )
+                    .replace('[CloneOf]', currentRom.CloneOf )
+                    .replace('[Year]', currentRom.Year )
+                    .replace('[Manufacturer]', currentRom.Manufacturer )
+                    .replace('[Category]', currentRom.Category )
+                    .replace('[Players]', currentRom.Players )
+                    .replace('[Rotation]', currentRom.Rotation )
+                    .replace('[Control]', currentRom.Control )
+                    .replace('[Status]', currentRom.Status )
+                    .replace('[DisplayCount]', currentRom.DisplayCount )
+                    .replace('[DisplayType]', currentRom.DisplayType )
+                    .replace('[AltRomname]', currentRom.AltRomname )
+                    .replace('[AltTitle]', currentRom.AltTitle )
+                    .replace('[PlayedTime]', currentStats.PlayedTime )
+                    .replace('[PlayedCount]', currentStats.PlayedCount )
+                    .replace('[SortValue]', currentDisplay.SortValue )
+                    .replace('[System]', data.emulators[currentRom.Emulator].System )
+                    .replace('[SystemN]', data.emulators[currentRom.Emulator].System )
+                    .replace('[Overview]', "" )
     },
     getAdjustedIndex: function(index_offset) {
         //not working, need to loop or not loop?

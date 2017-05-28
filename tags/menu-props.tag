@@ -26,7 +26,18 @@
                     <option if="{ typeof prop.values != 'string' }" each="{ val in prop.values }" selected="{ layout.selectedObject.values[key] == val }">{val}</option>
                 </select>
             </div>
+            <!-- file dropdown property -->
+            <div if="{ prop.type=='file' }" class="dropdown">
+                <input type="text" value="{ layout.selectedObject.values[key] }" onchange="{ updateProps }" />
+                <select if="{layout}" onchange="{ updateProps }">
+                    <option></option>
+                    <option each="{ file in layout.config.files }" if="{ file.type == prop.values }" value="{file.name}">{file.name}</option>
+                </select>
+            </div>
         </div>
+    </div>
+    <div if="{ !showProps() }">
+        <span>Click an object in the layout or in the objects list to view its properties</span>
     </div>
     <script>
         this.layout = null  //currently attached layout
@@ -54,6 +65,7 @@
                     this.layout.selectedObject.values[e.item.key] = e.target.checked
                     break
                 case 'dropdown':
+                case 'file':
                     if ( e.target.tagName == 'SELECT' ) {
                         e.target.previousElementSibling.value=e.target.value
                         e.target.previousElementSibling.focus()
@@ -72,8 +84,8 @@
             this.layout.on('object-selected', function() { this.update() }.bind(this) )
             this.layout.on('object-deselected', function() { this.update() }.bind(this) )
             this.layout.on('object-update', function() { this.update() }.bind(this) )
-            this.layout.on('media-added', function() { this.update(); }.bind(this) )
-            this.layout.on('media-deleted', function() { this.update(); }.bind(this) )
+            this.layout.on('file-added', function() { this.update(); }.bind(this) )
+            this.layout.on('file-deleted', function() { this.update(); }.bind(this) )
             this.update()
         }
     </script>

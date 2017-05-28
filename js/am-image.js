@@ -7,7 +7,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
     this.isArtwork = artwork || false
 
     var props = {
-        file_name: { label: 'file_name', type: 'dropdown', default: 'missing.png', values: '[media]' },
+        file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
         red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
         green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
         blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
@@ -39,7 +39,6 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.createElement = function() {
         this.el = document.createElement('div')
-        this.el.style.cursor = 'default'
         this.el.classList.add('image')
         this.el.style.backgroundRepeat = 'no-repeat'
 
@@ -60,16 +59,24 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.height = ( this.values.height  ) ? this.values.height + 'px' : 'auto'
         this.el.style.display = ( this.values.visible ) ? 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
-        this.el.style.zIndex = this.values.zorder
+        if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        var media = layout.findMedia(this.values.file_name, 'name')
-        var url = ( media ) ? media.data : ''
+        var file = layout.findFile(this.values.file_name, 'name')
+        var url = ( file ) ? file.data : ''
         if ( data && this.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
             url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
         }
         this.el.style.backgroundImage = 'url(\'' + url + '\')'
+        
+        //colorize image with svg filter
+        var red = (this.values.red / 255 ) || 0
+        var green = ( this.values.green / 255 ) || 0
+        var blue = ( this.values.blue / 255 ) || 0
+        riot.mixin('utils').createFilterColor('object-filter-' + this.id, red, green, blue)
+        this.el.style.filter = 'url(\'#object-filter-' + this.id + '\')'
+        
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.opacity = alpha
         if ( this.values.preserve_aspect_ratio ) {
@@ -101,11 +108,14 @@ function AMImage(file_name,x, y, width, height, artwork) {
                     case 'trigger':
                         //don't use yet
                         break
+                    case 'zorder':
+                        if ( this.values.zorder >= 0 ) code += '   [object].' + key + ' = [props].' + key + '\n'
+                        break
                     default:
                        code += '   [object].' + key + ' = [props].' + key + '\n'
                        break
                 }
-            })
+            }.bind(this))
         return code
     }
 }

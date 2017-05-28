@@ -13,7 +13,7 @@ function AMObject(x, y, width, height) {
         height: { label: 'height', type: 'number', default: 100, size: 4 },
         visible: { label: 'visible', type: 'bool', default: true },
         rotation: { label: 'rotation', type: 'number', default: 0, min: 0, max: 359 },
-        zorder: { label: 'zorder', type: 'number', default: 0, size: 2 }
+        zorder: { label: 'zorder', type: 'number', default: -1, size: 2 }
     }
     Object.keys(this.props).forEach(function(key) {
         this.values[key] = this.props[key].default

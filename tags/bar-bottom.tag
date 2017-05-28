@@ -15,9 +15,6 @@
             this.layout.on('object-deselected', function() {
                 this.setMessage(2, '')
             }.bind(this))
-            this.layout.on('cursor-move', function() {
-                this.setMessage( 1, this.layout.cursor[0] + 'x' + this.layout.cursor[1] )
-            }.bind(this))
             this.update()
         }
         setMessage(which, msg) {

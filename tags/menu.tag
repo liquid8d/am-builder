@@ -8,7 +8,7 @@
         .item .header .state.expanded::after { margin-right: 2px; content: '-'; }
         .item .header, .item .link, .item .label { display: flex; align-items: center; padding: 7px; margin: 5px; cursor: pointer; box-sizing: border-box; }
         .item .label { cursor: default; }
-        .item .content { display: block; font-size: 14px; margin: 0; padding: 5px; overflow: auto; box-sizing: border-box; }
+        .item .content { display: flex; flex-direction: column; font-size: 14px; margin: 0; padding: 5px; overflow: auto; box-sizing: border-box; }
     </style>
     
     <!-- item container -->

@@ -1,6 +1,11 @@
 {
     "displayIndex": 0,
     "listIndex": 0,
+    "filterIndex": 0,
+    "emulators": {
+        "mame": { "System": "Arcade" },
+        "zsnes": { "System": "Super Nintendo" }
+    },
     "displays": [
         {
             "name": "mame",
@@ -14,8 +19,17 @@
                 {"Name":"sf2","Title":"Street Fighter II: The World Warrior (World 910522)","Emulator":"mame","CloneOf":"","Year":1991,"Manufacturer":"Capcom","Category":"Fighter / Versus","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":6},
                 {"Name":"spf2t","Title":"Super Puzzle Fighter II Turbo (Euro 960529)","Emulator":"mame","CloneOf":"","Year":1996,"Manufacturer":"Capcom","Category":"Puzzle / Drop","Players":"2P sim","Rotation":0,"Control":"joystick (8-way)","Status":"good","DisplayCount":1,"DisplayType":"raster","AltRomname":"","AltTitle":"","Extra":"","Buttons":2}
             ],
+            "stats": {
+                "kinst": { "PlayedTime": 120, "PlayedCount": 3 }
+            },
             "favs": [ "kinst", "msvc", "mslugx", "mk", "mrdrillr", "sf2", "spf2t" ],
-            "filter": "favs"
+            "filters": [
+                { "name": "All" },
+                { "name": "Favs" }
+            ],
+            "Search": "None",
+            "SortName": "Info.Title",
+            "SortValue": "Info.Title"
         },
         {
             "name": "snes",
@@ -35,8 +49,17 @@
                 {"Name":"Super Mario World (USA)","Title":"Super Mario World (USA)","Emulator":"zsnes","CloneOf":"","Year":1990,"Manufacturer":"Nintendo","Category":"Platform","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""},
                 {"Name":"Teenage Mutant Ninja Turtles IV - Turtles in Time (USA)","Title":"Teenage Mutant Ninja Turtles IV - Turtles in Time (USA)","Emulator":"zsnes","CloneOf":"","Year":1992,"Manufacturer":"Konami","Category":"Action","Players":2,"Rotation":"","Control":"","Status":"","DisplayCount":"","DisplayType":"","AltRomname":"","AltTitle":"","Extra":"","Buttons":""}
             ],
+            "stats": {
+                "Breath of Fire II (USA)": { "PlayedTime": 120, "PlayedCount": 3 }
+            },
             "favs": [],
-            "filter": "favs"
+            "filters": [
+                { "name": "All" },
+                { "name": "Favs" }
+            ],
+            "Search": "None",
+            "SortName": "Info.Title",
+            "SortValue": "Info.Title"
         }
     ]
 }

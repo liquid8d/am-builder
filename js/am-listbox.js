@@ -23,8 +23,8 @@ function AMListBox(x, y, width, height) {
         selbg_blue: { label: 'selbg_blue', type: 'number', default: 255, min: 0, max: 255 },
         selbg_alpha: { label: 'selbg_alpha', type: 'number', default: 255, min: 0, max: 255 },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ]},
-        charsize: { label: 'charsize', type: 'number', default: -1, min: -1, max: 100 },
-        font: { label: 'font', type: 'text', default: 'Arial' },
+        charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
+        font: { label: 'font', type: 'file', default: '', values: 'font' },
         rows: { label: 'rows', type: 'number', default: 11 },
         format_string: { label: 'format_string', type: 'text', default: '[Title]' }
     }
@@ -36,7 +36,6 @@ function AMListBox(x, y, width, height) {
 
     this.createElement = function() {
         this.el = document.createElement('ul')
-        this.el.style.cursor = 'default'
         this.el.classList.add('listbox')
         this.el.style.listStyle = 'none'
         this.el.whiteSpace = 'nowrap'
@@ -59,7 +58,7 @@ function AMListBox(x, y, width, height) {
         this.el.style.textAlign = ( this.values.align == 'Align.Centre' ) ? 'center' : ( this.values.align == 'Align.Right' ) ? 'right' : 'left'
         this.el.style.fontFamily = this.values.font
         this.el.style.fontSize = ( this.values.charsize != -1 ) ? this.values.charsize + 'px' : 'initial'
-        this.el.style.zIndex = this.values.zorder
+        if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         this.el.innerHTML = ''
         for ( var i = 0; i < this.values.rows; i++ ) {
             var li = document.createElement('li')
@@ -73,18 +72,18 @@ function AMListBox(x, y, width, height) {
     }
 
     this.toSquirrel = function() {
-        var objId = 'listbox' + this.id
-        var code = 'local ' + objId + ' = fe.add_listbox( -1, -1, 1, 1 )' + '\n'
-            code += "      " + objId + '.set_pos( ' + this.values.x + ', ' + this.values.y + ', ' + this.values.width + ', ' + this.values.height + ' )' + '\n'
-            code += "      " + objId + '.visible = ' + this.values.visible + '\n'
-            code += "      " + objId + '.rotation = ' + this.values.rotation + '\n'
-            code += "      " + objId + '.zorder = ' + this.values.zorder + '\n'
-            code += "      " + objId + '.set_rgb( ' + this.values.red + ', ' + this.values.green + ', ' + this.values.blue + ' )' + '\n'
-            code += "      " + objId + '.alpha = ' + this.values.alpha + '\n'
-            code += "      " + objId + '.set_bg_rgb( ' + this.values.bg_red + ', ' + this.values.bg_green + ', ' + this.values.bg_blue + ' )' + '\n'
-            code += "      " + objId + '.bg_alpha = ' + this.values.bg_alpha + '\n'
-            code += "      " + objId + '.charsize = ' + this.values.charsize + '\n'
-            code += "      " + objId + '.align = ' + this.values.align + '\n'
+        var code = ''
+            code += 'local [object] = fe.add_listbox( -1, -1, 1, 1)' + '\n'
+            Object.keys(this.props).forEach(function(key) {
+                switch(key) {
+                    case 'zorder':
+                        if ( this.values.zorder >= 0 ) code += '   [object].' + key + ' = [props].' + key + '\n'
+                        break
+                    default:
+                       code += '   [object].' + key + ' = [props].' + key + '\n'
+                       break
+                }
+            }.bind(this))
         return code
     }
 }

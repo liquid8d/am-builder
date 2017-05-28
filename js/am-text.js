@@ -6,7 +6,7 @@ function AMText(x, y, width, height) {
     this.label = 'Text'
 
     var props = {
-        msg: { label: 'msg', type: 'dropdown', default: '[Title]', values: [ '[DisplayName]', '[ListSize]', '[ListEntry]', '[FilterName]', '[Search]', '[SortName]', '[Name]', '[Title]', '[Emulator]', '[CloneOf]', '[Year]', '[Manufacturer]', '[Category]', '[Players]', '[Rotation]' ] },
+        msg: { label: 'msg', type: 'dropdown', default: '[Title]', values: [ '[DisplayName]', '[ListSize]', '[ListEntry]', '[FilterName]', '[Search]', '[SortName]', '[Name]', '[Title]', '[Emulator]', '[CloneOf]', '[Year]', '[Manufacturer]', '[Category]', '[Players]', '[Rotation]', '[Control]', '[Status]', '[DisplayCount]', '[DisplayType]', '[AltRomname]', '[AltTitle]', '[PlayedTime]', '[PlayedCount]', '[SortValue]', '[System]', '[SystemN]', '[Overview]' ] },
         red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
         green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
         blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
@@ -21,7 +21,7 @@ function AMText(x, y, width, height) {
         style: { label: 'style', type: 'select', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
-        font: { label: 'font', type: 'text', default: 'Arial' },
+        font: { label: 'font', type: 'file', default: '', values: 'font' },
         //shader: { label: 'shader', type: 'text', default: '' }
     }
 
@@ -33,7 +33,6 @@ function AMText(x, y, width, height) {
     //create the html element
     this.createElement = function() {
         this.el = document.createElement('span')
-        this.el.style.cursor = 'default'
         this.el.style.overflow = 'hidden'
     }
 
@@ -53,7 +52,7 @@ function AMText(x, y, width, height) {
         this.el.style.textAlign = ( this.values.align == 'Align.Centre' ) ? 'center' : ( this.values.align == 'Align.Right' ) ? 'right' : 'left'
         this.el.style.fontFamily = this.values.font
         this.el.style.fontSize = ( this.values.charsize != -1 ) ? this.values.charsize + 'px' : '100vh'
-        this.el.style.zIndex = this.values.zorder
+        if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         this.el.style.whiteSpace = ( this.values.word_wrap ) ? 'normal' : 'nowrap'
         if ( this.values.style.indexOf('Style.Bold') > -1 ) this.el.style.fontWeight = 'bold'
         if ( this.values.style.indexOf('Style.Italic') > -1 ) this.el.style.fontStyle = 'italic'
@@ -67,11 +66,14 @@ function AMText(x, y, width, height) {
             code += 'local [object] = fe.add_text( "' + this.values.msg + '", -1, -1, 1, 1 )' + '\n'
             Object.keys(this.props).forEach(function(key) {
                 switch(key) {
+                    case 'zorder':
+                        if ( this.values.zorder >= 0 ) code += '   [object].' + key + ' = [props].' + key + '\n'
+                        break
                     default:
                        code += '   [object].' + key + ' = [props].' + key + '\n'
                        break
                 }
-            })
+            }.bind(this))
         return code
     }
 }
