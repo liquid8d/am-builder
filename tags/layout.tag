@@ -244,31 +244,14 @@
             }.bind(this)
             
             interact('.object')
+                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
                 .draggable({
                     restrict: {
-                        /*
-                        restriction: function(x, y, element) {
-                            //TODO: fix zoom dragging here
-                            var rect = element.getBoundingClientRect();
-                            return {
-                                top: rect.y,
-                                right: rect.x + rect.width,
-                                bottom: rect.y + rect.height,
-                                left: rect.x
-                            }
-                        },
-                        */
                         endOnly: true,
                         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
                     },
                     snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
                 })
-                .resizable({
-                    preserveAspectRatio: false,
-                    edges: { left: true, right: true, bottom: true, top: true },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
-                })
-                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
                 .on('dragmove', function(event) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
                     var left = event.target.offsetLeft + event.dx
@@ -281,6 +264,11 @@
                     this.selectedObject.values.y = top
                     this.trigger('object-update')
                 }.bind(this))
+                .resizable({
+                    preserveAspectRatio: false,
+                    edges: { left: true, right: true, bottom: true, top: true },
+                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
+                })
                 .on('resizemove', function(event) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
                     var target = event.target,

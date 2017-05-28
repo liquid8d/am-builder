@@ -36,18 +36,20 @@
             <!-- top toolbar -->
             <bar-top class="horizontal-toolbar top"></bar-top>
             <div class="main">
-                <menu></menu>
+                <div class="vertical-toolbar left" style="padding: 0;">
+                    <ul class="tabs">
+                        <li class="tab selected" data-tab="menu-design"><div class="icon design" data-menu="menu-design" title="Design" onclick="toggleMenu(event)"></div></li>
+                        <li class="tab" data-tab="menu-settings"><div class="icon settings" data-menu="menu-settings" title="Settings" onclick="toggleMenu(event)"></div></li>
+                        <li class="tab" data-tab="menu-dev"><div class="icon dev" title="Dev" data-menu="menu-dev" onclick="toggleMenu(event)"></div></li>
+                    </ul>
+                </div>
+                <div class="menus">
+                    <menu id="menu-design"></menu>
+                    <menu id="menu-settings" style="display: none;">Settings here</menu>
+                    <menu id="menu-dev" style="display: none;"></menu>
+                </div>
                 <resizer></resizer>
                 <layout></layout>
-            </div>
-            <!-- dev toolbar(s) -->
-            <div class="horizontal-toolbar bottom">
-                <span>Dev</span>
-                <button onclick="console.dir(layout)">Layout</button>
-                <button onclick="console.table(data.displays)">Displays</button>
-                <button onclick="console.table(data.displays[data.displayIndex].romlist)">CurrentList</button>
-                <button onclick="console.table(layout.config.files)">Files</button>
-                <button onclick="console.dir(layout.selectedObject)">Object Vals</button>
             </div>
             <!-- bottom toolbar -->
             <bar-bottom class="horizontal-toolbar bottom"></bar-bottom>
@@ -66,11 +68,11 @@
                 }
             })
 
-            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia, menuFonts, menuShaders
+            var layout, barTop, barBottom, designMenu, settingsMenu, devMenu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia, menuFonts, menuShaders
             riot.compile(function() {
-                //setup menu
-                menu = riot.mount('menu')[0]
-                menu.setMenu({
+                //setup design menu
+                designMenu = riot.mount('#menu-design')[0]
+                designMenu.setMenu({
                     accordian: false,
                     items: [
                         { label: 'Tools', content: '<menu-tools></menu-tools>' },
@@ -84,7 +86,8 @@
                         { label: 'Shaders', foldable: true, content: '<menu-files id="menu-shaders" allowed=".vert,.frag" file_type="shader" drop_msg="Drag your shaders here"></menu-files>' },
                     ]
                 })
-                //mount menu components
+
+                //mount design menu components
                 menuTools = riot.mount('menu-tools')[0]
                 menuLayout = riot.mount('menu-layout')[0]
                 menuProps = riot.mount('menu-props')[0]
@@ -97,11 +100,37 @@
                 menuFonts = riot.mount('#menu-fonts')[0]
                 menuShaders = riot.mount('#menu-shaders')[0]
                 
+                //setup settings menu
+                settingsMenu = riot.mount('#menu-settings')[0]
+                settingsMenu.setMenu({
+                    accordian: false,
+                    items: [
+                        { label: 'Settings', content: 'Settings here' },
+                    ]
+                })
+                
+                //setup dev menu
+                devMenu = riot.mount('#menu-dev')[0]
+                devMenu.setMenu({
+                    accordian: false,
+                    items: [
+                        { 
+                            content: '<button onclick="console.dir(layout)">Output Layout</button>' +
+                            '<button onclick="console.table(data.displays)">Output Displays</button>' +
+                            '<button onclick="console.table(data.displays[data.displayIndex].romlist)">Output Current Romlist</button>' +
+                            '<button onclick="console.table(layout.config.files)">Output Files</button>' +
+                            '<button onclick="console.dir(layout.selectedObject)">Output SelectedObject</button>'
+                        },
+                    ]
+                })
+
                 //hook up menu resizer
                 var menuResizer = riot.mount('resizer')[0]
                 menuResizer.on('resize', function(e) {
-                    console.log('menu resizing')
-                    document.querySelector('menu').style.flexBasis = (e.clientX + e.movementX - 2) + 'px'
+                    var menus = document.querySelector('.menus')
+                    var val = e.clientX - menus.offsetLeft + e.movementX
+                    //had to do constraints here due to flexBasis not working properly
+                    if ( val > 92 && val < 320 ) menus.style.minWidth = menus.style.maxWidth = val + 'px'
                 })
                 
                 //mount layout and hook components to the layout
@@ -116,6 +145,29 @@
                 menuFonts.setLayout(layout)
                 menuShaders.setLayout(layout)
             })
+
+            //toggle menu by id
+            function toggleMenu(e) {
+                var which = e.target.getAttribute('data-menu')
+                var children = document.querySelector('.menus').children
+                var visible = ''
+                for ( var i = 0; i < children.length; i++) {
+                    //switch to the requested menu id
+                    if ( children[i].style.display != 'none' ) visible = children[i].id
+                    children[i].style.display = ( children[i].id == which ) ? 'flex' : 'none'
+                }
+                for ( var i = 0; i < children.length; i++)
+                    document.querySelector('.tab[data-tab="' + children[i].id + '"]').classList.remove('selected')
+                document.querySelector('.tab[data-tab="' + which + '"]').classList.add('selected')
+                if ( visible == which ) {
+                    //if we clicked the already visible id, hide the menus
+                    document.querySelector('.menus').style.display = document.querySelector('#' + which).style.display = 'none'
+                    document.querySelector('.tab[data-tab="' + which + '"]').classList.remove('selected')
+                } else {
+                    //show the menus
+                    document.querySelector('.menus').style.display = 'flex'
+                }
+            }
 
             function showModal(html) {
                 document.querySelector('.modal').style.display = 'block'
