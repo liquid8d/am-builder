@@ -7,7 +7,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
     this.isArtwork = artwork || false
 
     var props = {
-        file_name: { label: 'file_name', type: 'dropdown', default: 'missing.png', values: '[media]' },
+        file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
         red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
         green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
         blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
@@ -61,8 +61,8 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        var media = layout.findMedia(this.values.file_name, 'name')
-        var url = ( media ) ? media.data : ''
+        var file = layout.findFile(this.values.file_name, 'name')
+        var url = ( file ) ? file.data : ''
         if ( data && this.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]

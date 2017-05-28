@@ -24,7 +24,7 @@
         <script src="tags/menu-objects.tag" type="riot/tag"></script>
         <script src="tags/menu-data.tag" type="riot/tag"></script>
         <script src="tags/menu-triggers.tag" type="riot/tag"></script>
-        <script src="tags/menu-media.tag" type="riot/tag"></script>
+        <script src="tags/menu-files.tag" type="riot/tag"></script>
         <script src="tags/bar-top.tag" type="riot/tag"></script>
         <script src="tags/bar-bottom.tag" type="riot/tag"></script>
         <script src="tags/resizer.tag" type="riot/tag"></script>
@@ -46,7 +46,7 @@
                 <button onclick="console.dir(layout)">Layout</button>
                 <button onclick="console.table(data.displays)">Displays</button>
                 <button onclick="console.table(data.displays[data.displayIndex].romlist)">CurrentList</button>
-                <button onclick="console.table(layout.config.media)">Media</button>
+                <button onclick="console.table(layout.config.files)">Files</button>
                 <button onclick="console.dir(layout.selectedObject)">Object Vals</button>
             </div>
             <!-- bottom toolbar -->
@@ -66,7 +66,7 @@
                 }
             })
 
-            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia
+            var layout, barTop, barBottom, menu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia, menuFonts, menuShaders
             riot.compile(function() {
                 //setup menu
                 menu = riot.mount('menu')[0]
@@ -76,12 +76,12 @@
                         { label: 'Tools', content: '<menu-tools></menu-tools>' },
                         { label: 'Objects', expand: true, foldable: true, maxHeight: '160px', content: '<menu-objects></menu-objects>' },
                         { label: 'Properties', expand: false, foldable: true, maxHeight: '240px', content: '<menu-props></menu-props>' },
-                        { label: 'Media', foldable: true, content: '<menu-media></menu-media>'},
                         { label: 'Data', foldable: true, content: '<menu-data></menu-data>' },
                         { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
                         { label: 'Triggers', foldable: true, content: '<menu-triggers></menu-triggers>' },
-                        { label: 'Shaders', foldable: true, content: '<p>Shaders placeholder</p>' },
-                        { label: 'Fonts', foldable: true, content: '<p>Fonts placeholder</p>' },
+                        { label: 'Media', foldable: true, content: '<menu-files id="menu-media" allowed="image/*" file_type="media" drop_msg="Drag your media here"></menu-files>'},
+                        { label: 'Fonts', foldable: true, content: '<menu-files id="menu-fonts" allowed=".ttf,.otf" file_type="font" drop_msg="Drag your fonts here"></menu-files>' },
+                        { label: 'Shaders', foldable: true, content: '<menu-files id="menu-shaders" allowed=".vert,.frag" file_type="shader" drop_msg="Drag your shaders here"></menu-files>' },
                     ]
                 })
                 //mount menu components
@@ -91,9 +91,11 @@
                 menuObjects = riot.mount('menu-objects')[0]
                 menuData = riot.mount('menu-data')[0]
                 menuTriggers = riot.mount('menu-triggers')[0]
-                menuMedia = riot.mount('menu-media')[0]
                 barTop = riot.mount('bar-top')[0]
                 barBottom = riot.mount('bar-bottom')[0]
+                menuMedia = riot.mount('#menu-media')[0]
+                menuFonts = riot.mount('#menu-fonts')[0]
+                menuShaders = riot.mount('#menu-shaders')[0]
                 
                 //hook up menu resizer
                 var menuResizer = riot.mount('resizer')[0]
@@ -109,8 +111,10 @@
                 menuLayout.setLayout(layout)
                 menuProps.setLayout(layout)
                 menuObjects.setLayout(layout)
-                menuMedia.setLayout(layout)
                 menuData.setLayout(layout)
+                menuMedia.setLayout(layout)
+                menuFonts.setLayout(layout)
+                menuShaders.setLayout(layout)
             })
 
             function showModal(html) {

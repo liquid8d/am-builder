@@ -21,7 +21,7 @@ function AMText(x, y, width, height) {
         style: { label: 'style', type: 'select', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
-        font: { label: 'font', type: 'text', default: 'Arial' },
+        font: { label: 'font', type: 'file', default: '', values: 'font' },
         //shader: { label: 'shader', type: 'text', default: '' }
     }
 

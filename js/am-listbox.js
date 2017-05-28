@@ -24,7 +24,7 @@ function AMListBox(x, y, width, height) {
         selbg_alpha: { label: 'selbg_alpha', type: 'number', default: 255, min: 0, max: 255 },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ]},
         charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
-        font: { label: 'font', type: 'text', default: 'Arial' },
+        font: { label: 'font', type: 'file', default: '', values: 'font' },
         rows: { label: 'rows', type: 'number', default: 11 },
         format_string: { label: 'format_string', type: 'text', default: '[Title]' }
     }
