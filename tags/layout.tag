@@ -270,7 +270,7 @@
                 })
                 .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
                 .on('dragmove', function(event) {
-                    if ( !this.selectedObject ) return
+                    if ( !this.selectedObject || this.selectedObject.locked ) return
                     var left = event.target.offsetLeft + event.dx
                     var top = event.target.offsetTop + event.dy
                     
