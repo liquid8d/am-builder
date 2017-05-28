@@ -64,8 +64,8 @@ menu {
     flex: 0 0;
     background: rgb(30, 30, 30);
     color: rgb(180, 180, 180);
-    flex-basis: 172px;
-    min-width: 172px;
+    flex-basis: 192px;
+    min-width: 192px;
 }
 
 menu .items { flex-grow: 1; padding: 0; }
