@@ -65,6 +65,7 @@ function AMListBox(x, y, width, height) {
         this.el.innerHTML = ''
         for ( var i = 0; i < this.values.rows; i++ ) {
             var li = document.createElement('li')
+            li.style.pointerEvents = 'none'
             li.innerHTML = utils.magicTokens( this.values.format_string, i )
             if ( i == 0 ) {
                 li.style.backgroundColor = 'rgba(' + this.values.selbg_red + ',' + this.values.selbg_green + ',' + this.values.selbg_blue + ',' + this.values.selbg_alpha + ')'
