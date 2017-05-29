@@ -7,14 +7,14 @@ function AMText(x, y, width, height) {
 
     var props = {
         msg: { label: 'msg', type: 'dropdown', default: '[Title]', values: [ '[DisplayName]', '[ListSize]', '[ListEntry]', '[FilterName]', '[Search]', '[SortName]', '[Name]', '[Title]', '[Emulator]', '[CloneOf]', '[Year]', '[Manufacturer]', '[Category]', '[Players]', '[Rotation]', '[Control]', '[Status]', '[DisplayCount]', '[DisplayType]', '[AltRomname]', '[AltTitle]', '[PlayedTime]', '[PlayedCount]', '[SortValue]', '[System]', '[SystemN]', '[Overview]' ] },
-        red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
-        green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
-        blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
-        alpha: { label: 'alpha', type: 'number', default: 255, min: 0, max: 255 },
-        bg_red: { label: 'bg_red', type: 'number', default: 0, min: 0, max: 255 },
-        bg_green: { label: 'bg_green', type: 'number', default: 0, min: 0, max: 255 },
-        bg_blue: { label: 'bg_blue', type: 'number', default: 0, min: 0, max: 255 },
-        bg_alpha: { label: 'bg_alpha', type: 'number', default: 0, min: 0, max: 255 },
+        red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
+        green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
+        blue: { label: 'blue', type: 'range', default: 255, min: 0, max: 255 },
+        alpha: { label: 'alpha', type: 'range', default: 255, min: 0, max: 255 },
+        bg_red: { label: 'bg_red', type: 'range', default: 0, min: 0, max: 255 },
+        bg_green: { label: 'bg_green', type: 'range', default: 0, min: 0, max: 255 },
+        bg_blue: { label: 'bg_blue', type: 'range', default: 0, min: 0, max: 255 },
+        bg_alpha: { label: 'bg_alpha', type: 'range', default: 0, min: 0, max: 255 },
         word_wrap: { label: 'word_wrap', type: 'bool', default: false },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ] },
         charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
@@ -45,6 +45,7 @@ function AMText(x, y, width, height) {
         this.el.style.height = this.values.height + 'px'
         this.el.style.display = ( this.values.visible ) ? ( this.values.word_wrap ) ? 'inline-block' : 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
+        this.el.style.transformOrigin = '0 0'
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.color = 'rgba(' + this.values.red + ',' + this.values.green + ',' + this.values.blue + ', ' + alpha + ')'
         var bg_alpha = ( this.values.bg_alpha > 0 ) ? this.values.bg_alpha / 255 : 0
@@ -54,8 +55,8 @@ function AMText(x, y, width, height) {
         this.el.style.fontSize = ( this.values.charsize != -1 ) ? this.values.charsize + 'px' : '100vh'
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         this.el.style.whiteSpace = ( this.values.word_wrap ) ? 'normal' : 'nowrap'
-        if ( this.values.style.indexOf('Style.Bold') > -1 ) this.el.style.fontWeight = 'bold'
-        if ( this.values.style.indexOf('Style.Italic') > -1 ) this.el.style.fontStyle = 'italic'
+        this.el.style.fontWeight = ( this.values.style.indexOf('Style.Bold') > -1 ) ? 'bold' : 'normal'
+        this.el.style.fontStyle = ( this.values.style.indexOf('Style.Italic') > -1 ) ? 'italic' : ''
         if ( this.values.style.indexOf('Style.Underlined') > -1 ) this.el.style.textDecoration = 'underline'
     }
 

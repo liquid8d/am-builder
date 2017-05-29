@@ -8,10 +8,10 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     var props = {
         file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
-        red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
-        green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
-        blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
-        alpha: { label: 'alpha', type: 'number', default: 255, min: 0, max: 255 },
+        red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
+        green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
+        blue: { label: 'blue', type: 'range', default: 255, min: 0, max: 255 },
+        alpha: { label: 'alpha', type: 'range', default: 255, min: 0, max: 255 },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
         skew_x: { label: 'skew_x', type: 'number', default: 0 },
