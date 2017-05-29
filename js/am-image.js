@@ -40,6 +40,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
     this.createElement = function() {
         this.el = document.createElement('div')
         this.el.classList.add('artwork')
+        this.el.style.textAlign = 'center'
 
         if ( this.isArtwork ) {
             console.log('adding artwork' )
@@ -60,17 +61,15 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        var file = layout.findFile(this.values.file_name, 'name')
-        var url = ( file ) ? file.data : ''
-        if ( data && this.isArtwork ) {
+        if ( this.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
-            if ( this.el.querySelector('video') ) this.el.removeChild(this.el.querySelector('video'))
+            var video = this.el.querySelector('video')
+            if ( video ) this.el.removeChild(video)
             if ( this.values.video_playing ) {
-                url = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
-                //add a video element
+                //add a video element for artwork video
                 var video = document.createElement('video')
-                    video.src = url
+                    video.src = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
                     video.setAttribute('type', 'video/mp4')
                     video.style.pointerEvents = 'none'
                     video.style.width = '100%'
@@ -82,13 +81,18 @@ function AMImage(file_name,x, y, width, height, artwork) {
                 this.el.style.backgroundImage = ''
                 this.el.appendChild(video)
             } else {
-                url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
-                this.el.style.backgroundRepeat = 'no-repeat'
-                this.el.style.backgroundImage = 'url(\'' + url + '\')'
-                this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : ''
-                this.el.style.backgroundSize = ( this.values.preserve_aspect_ratio ) ? '' : '100% 100%'
+                //artwork images
+                this.el.style.backgroundImage = 'url(\'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png\')'
             }
+        } else {
+            //standard images
+            var file = layout.findFile(this.values.file_name, 'name')
+            this.el.style.backgroundImage = ( file ) ? 'url(\'' + file.data + '\')' : ''
         }
+        
+        this.el.style.backgroundRepeat = 'no-repeat'
+        this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : '0 0'
+        this.el.style.backgroundSize = ( this.values.preserve_aspect_ratio ) ? 'contain' : '100% 100%'
         
         //colorize image with svg filter
         var red = (this.values.red / 255 ) || 0
