@@ -25,7 +25,8 @@
             "favs": [ "kinst", "msvc", "mslugx", "mk", "mrdrillr", "sf2", "spf2t" ],
             "filters": [
                 { "name": "All" },
-                { "name": "Favs" }
+                { "name": "Favourites" },
+                { "name": "Capcom" }
             ],
             "Search": "None",
             "SortName": "Info.Title",
@@ -55,7 +56,8 @@
             "favs": [],
             "filters": [
                 { "name": "All" },
-                { "name": "Favs" }
+                { "name": "Favourites" },
+                { "name": "Nintendo" }
             ],
             "Search": "None",
             "SortName": "Info.Title",

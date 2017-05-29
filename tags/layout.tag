@@ -106,12 +106,14 @@
         next_display() {
             data.displayIndex = ( data.displayIndex < data.displays.length - 1 ) ? data.displayIndex + 1 : 0
             data.listIndex = 0
+            data.filterIndex = 0
             console.log('next_display: ' + data.displayIndex )
             this.updateElements()
         }
         prev_display() {
             data.displayIndex = ( data.displayIndex > 0 ) ? data.displayIndex - 1 : data.displays.length - 1
             data.listIndex = 0
+            data.filterIndex = 0
             console.log('prev_display: ' + data.displayIndex )
             this.updateElements()
         }
@@ -125,6 +127,18 @@
             var currentDisplay = data.displays[data.displayIndex]
             data.listIndex = ( data.listIndex > 0 ) ? data.listIndex - 1 : currentDisplay.romlist.length - 1
             console.log('prev_rom: ' + data.listIndex )
+            this.updateElements()
+        }
+        next_filter() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.filterIndex = ( data.filterIndex < currentDisplay.filters.length - 1 ) ? data.filterIndex + 1 : 0
+            console.log('next_filter: ' + data.filterIndex )
+            this.updateElements()
+        }
+        prev_filter() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.filterIndex = ( data.filterIndex > 0 ) ? data.filterIndex - 1 : currentDisplay.filters.length - 1
+            console.log('prev_filter: ' + data.filterIndex )
             this.updateElements()
         }
 
