@@ -58,8 +58,10 @@
         updateProps(e) {
             switch( e.item.prop.type ) {
                 case 'text':
-                case 'range':
                     this.layout.selectedObject.values[e.item.key] = e.target.value
+                    break
+                case 'range':
+                    this.layout.selectedObject.values[e.item.key] = parseInt(e.target.value)
                     break
                 case 'select':
                     this.layout.selectedObject.values[e.item.key] = e.target.selectedOptions[0].value
