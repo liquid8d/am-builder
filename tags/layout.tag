@@ -252,7 +252,6 @@
                 })
                 .on('dragmove', function(e) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                        console.dir(interact('object'))
                         var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                         var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
                             y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
