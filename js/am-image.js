@@ -24,7 +24,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
         subimg_height: { label: 'subimg_height', type: 'number', default: 0 },
         origin_x: { label: 'origin_x', type: 'number', default: 0 },
         origin_y: { label: 'origin_y', type: 'number', default: 0 },
-        video_flags: { label: 'video_flags', type: 'select', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
+        video_flags: { label: 'video_flags', type: 'select', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
         video_playing: { label: 'video_playing', type: 'bool', default: false },
         preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
         smooth: { label: 'smooth', type: 'bool', default: false },
@@ -39,8 +39,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.createElement = function() {
         this.el = document.createElement('div')
-        this.el.classList.add('image')
-        this.el.style.backgroundRepeat = 'no-repeat'
+        this.el.classList.add('artwork')
 
         if ( this.isArtwork ) {
             console.log('adding artwork' )
@@ -66,9 +65,30 @@ function AMImage(file_name,x, y, width, height, artwork) {
         if ( data && this.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
-            url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
+            if ( this.el.querySelector('video') ) this.el.removeChild(this.el.querySelector('video'))
+            if ( this.values.video_playing ) {
+                url = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
+                //add a video element
+                var video = document.createElement('video')
+                    video.src = url
+                    video.setAttribute('type', 'video/mp4')
+                    video.style.pointerEvents = 'none'
+                    video.style.width = '100%'
+                    video.style.height = '100%'
+                    video.style.objectFit = ( this.values.preserve_aspect_ratio ) ? 'contain' : 'fill'
+                    if ( this.values.video_flags.indexOf('Vid.Default') > -1 || this.values.video_flags.indexOf('Vid.NoAutoStart') == -1 ) video.setAttribute('autoplay', true)
+                    if ( this.values.video_flags.indexOf('Vid.Default') > -1 || this.values.video_flags.indexOf('Vid.NoLoop') == -1 ) video.setAttribute('loop', true)
+                    if ( this.values.video_flags.indexOf('Vid.NoAudio') > -1 ) video.setAttribute('muted', true)
+                this.el.style.backgroundImage = ''
+                this.el.appendChild(video)
+            } else {
+                url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
+                this.el.style.backgroundRepeat = 'no-repeat'
+                this.el.style.backgroundImage = 'url(\'' + url + '\')'
+                this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : ''
+                this.el.style.backgroundSize = ( this.values.preserve_aspect_ratio ) ? '' : '100% 100%'
+            }
         }
-        this.el.style.backgroundImage = 'url(\'' + url + '\')'
         
         //colorize image with svg filter
         var red = (this.values.red / 255 ) || 0
@@ -79,13 +99,6 @@ function AMImage(file_name,x, y, width, height, artwork) {
         
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.opacity = alpha
-        if ( this.values.preserve_aspect_ratio ) {
-            this.el.style.backgroundSize = ''
-            this.el.style.backgroundPosition = 'center'
-        } else {
-            this.el.style.backgroundPosition = ''
-            this.el.style.backgroundSize = '100% 100%'
-        }
         this.el.draggable = false
     }
 
