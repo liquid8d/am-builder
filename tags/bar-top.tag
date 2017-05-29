@@ -7,9 +7,12 @@
         <option if="{layout}" each="{ val in layout.aspects }" value="{val}" selected="{ val == layout.aspect }">{val}</option>
     </select>
     <span>Zoom</span>
-    <select id="zoom" onchange="{setZoom}">
-        <option each="{ val in zoomLevels }" value="{val}" selected="{ val == defaultZoom }">{val}%</option>
-    </select>
+    <div if="{layout}" class="dropdown">
+        <input type="text" value="{ layout.config.editor.zoom }%" onchange="{ setZoom }" />
+        <select id="zoom" onchange="{ setZoom }">
+            <option each="{ val in zoomLevels }" value="{val}" selected="{ layout.config.editor.zoom == val }">{val}%</option>
+        </select>
+    </div>
     <span>Show Grid</span>
     <input if="{layout}" type="checkbox" checked onchange="{layout.toggleGridlines}" />
     <span>Snap to Grid</span>
@@ -26,7 +29,11 @@
             layout.updateAspect( e.target.selectedOptions[0].value )
         }
         setZoom(e) {
-            layout.setZoom( e.target.selectedOptions[0].value )
+            if ( e.target.tagName == 'SELECT' ) {
+                layout.setZoom( e.target.selectedOptions[0].value )
+            } else {
+                layout.setZoom( e.target.value.replace('%', '') )
+            }
         }
     </script>
 </bar-top>
