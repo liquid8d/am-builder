@@ -25,18 +25,15 @@
             background: linear-gradient(rgb(5,5,5),rgb(15,15,15),rgb(5,5,5));
         }
         .gridlines {
-            position: absolute;
-            width: 100%;
+            background: url('data:image/gif;base64,R0lGODlhZABkAJECADQ1OSUlJgAAAAAAACH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxMzggNzkuMTU5ODI0LCAyMDE2LzA5LzE0LTAxOjA5OjAxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjZjYjI5MTg0LTAyNTctNGE0Ni1hZDM1LTdiNjQ3YzJmYzg5ZSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpERDJDQzgwQTQ0MEExMUU3QURENUZBN0Q3RTUyOUI0QSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpERDJDQzgwOTQ0MEExMUU3QURENUZBN0Q3RTUyOUI0QSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNyAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2Y2IyOTE4NC0wMjU3LTRhNDYtYWQzNS03YjY0N2MyZmM4OWUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NmNiMjkxODQtMDI1Ny00YTQ2LWFkMzUtN2I2NDdjMmZjODllIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkEAQAAAgAsAAAAAGQAZAAAAv+Uf4Grm/6gAFI0eF1mlcqNgBHWVaJxWmb5re0LeSSsubFd05wk5/Pvc/R2QGJwMQzhjExEcnRU6pxLadEqrEKbW+q0C0axrmHV1/AUn81ktFbdZmfXqXongM/r9/y+/68HADhIWJiXJscFF3WAaEc3xriomOgV9xjn+FZZpgm55nm5GSrJOWlZillKSqmKtOmK9fopygN7a0ubGtmKe6Pbm1s7PEccHGOYrBy43GzIKhvd6bsrXG2MenxdvK09i12WAh0+Su2dLX1Kbn2+/guuHj9hnm46D1wvTu/O3S6vj4/ft275eBUMiMaZQkCCFjrcM+5fOYT2AMKraFDgwXf/BDU22ieR3caObijG+mhy4sWTJVeqJIlRpMeQHP3FrDnSZsSbq0DyHGiT5YSHRPE0LOpwp1CLMIUq9fmUYtSLU2FW1enTadaXQbnm/IrSJaitY1OWFZuJbFqza9GuAgA3rty5dOvavYs3r969d9X2ZPvXLaWrYFs29TrzJ7rEWgEP9vvYcT3CiSnT7FdYcdjDZzm39RwYdGTBk5E+PGramWXNhrt2dv0ZdmjZo0VPhnxb8jTd8lY3Jr0beG/cwW0Xp51buD3fiC/rTL0QNXRlzF9n/m18OO/lxLUrZ4r8+PXmrMtXjz3eOmPyS9l3v/c9o/PM52enzzRddf5m9WuHY/eeHXfbgXeffeupN19l7xF4IHoNGphghPAFyKCE2P0nYHwyWejedv2Vth91IVK3oHzlXVigfykmR6GJ7SF4YofKfSjegyrayCKGFcYI44sOctjjezQCqGMHfB2JZJJKLglAAQA7') repeat;
             height: 100%;
-            background-color: transparent;
-            background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
-            background-position: -7px -19px;
-            background-size: 25px 25px;
+            pointer-events: none;
         }
 
         .object {
             position: absolute;
             font-family: Arial;
+            pointer-events: all;
         }
         .object.image {
             background-size: contain;
@@ -55,7 +52,8 @@
             editor: {
                 zoom: 100,
                 gridlines: true,
-                snap: true
+                snap: true,
+                snapSize: 10
             },
             globals: {
                 width: { label: 'width', type: 'number', default: 640 },
@@ -250,24 +248,22 @@
                         endOnly: true,
                         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
                     },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
-                .on('dragmove', function(event) {
+                .on('dragmove', function(e) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                    var left = event.target.offsetLeft + event.dx
-                    var top = event.target.offsetTop + event.dy
-                    
-                    event.target.style.left = left + 'px'
-                    event.target.style.top = top + 'px'
-
-                    this.selectedObject.values.x = left
-                    this.selectedObject.values.y = top
-                    this.trigger('object-update')
+                        console.dir(interact('object'))
+                        var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                        var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
+                            y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
+                            this.selectedObject.el.style.left = x + 'px'
+                            this.selectedObject.el.style.top = y + 'px'
+                        this.trigger('object-update')
                 }.bind(this))
                 .resizable({
                     preserveAspectRatio: false,
                     edges: { left: true, right: true, bottom: true, top: true },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('resizemove', function(event) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
@@ -411,8 +407,8 @@
         }
 
         setZoom(per) {
-            var layout = this.root.querySelector('.layout')
-            layout.style.zoom = per + '%'
+            //this.root.style.zoom = scale
+            this.root.querySelector('.layout').style.zoom = per + '%'
             this.config.editor.zoom = per
         }
 
@@ -432,5 +428,13 @@
             }
         }
 
+        this.on('mount', function() {
+            this.root.querySelector('.layout').onmousemove = function(e) {
+                var scale = ( this.config.editor.zoom / 100 )
+                var x = e.layerX / scale,
+                    y = e.layerY / scale
+                barBottom.setMessage(1, 'x: ' + x + ' y: ' + y )
+            }.bind(this)
+        })
     </script>
 </layout>
