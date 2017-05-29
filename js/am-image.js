@@ -24,7 +24,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
         subimg_height: { label: 'subimg_height', type: 'number', default: 0 },
         origin_x: { label: 'origin_x', type: 'number', default: 0 },
         origin_y: { label: 'origin_y', type: 'number', default: 0 },
-        video_flags: { label: 'video_flags', type: 'select', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
+        video_flags: { label: 'video_flags', type: 'multiselect', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
         video_playing: { label: 'video_playing', type: 'bool', default: false },
         preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
         smooth: { label: 'smooth', type: 'bool', default: false },

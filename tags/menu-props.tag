@@ -4,6 +4,10 @@
         .list { width: 100%; }
         input[type="number"] { width: 50px; }
         .item > input[type="text"] { width: 100px; }
+        .multiselect {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
     <div if="{ showProps() }" class="list">
         <div class="item" each="{ prop, key in layout.selectedObject.props }">
@@ -38,6 +42,10 @@
                     <option></option>
                     <option each="{ file in layout.config.files }" if="{ file.type == prop.values }" value="{file.name}">{file.name}</option>
                 </select>
+            </div>
+            <!-- multiselect property -->
+            <div if="{ prop.type == 'multiselect' }" class="multiselect" onclick="{updateProps}">
+                <label each="{ option in prop.values }" for="{option}"><input type="checkbox" value="{ option }" onclick="{this.parent.click}" checked="{ layout.selectedObject.values[key].indexOf(option) > -1 }" />{ option }</label>
             </div>
         </div>
     </div>
@@ -81,6 +89,14 @@
                     } else {
                         this.layout.selectedObject.values[e.item.key] = e.target.value
                     }
+                    break
+                case 'multiselect':
+                    var flags = ''
+                    var options = e.target.parentElement.parentElement.querySelectorAll('input')
+                    for ( var i = 0; i < options.length; i++ )
+                        if ( options[i].checked )
+                            flags += ( flags == '' ) ? options[i].value : '|' + options[i].value
+                    this.layout.selectedObject.values[e.item.key] = flags
                     break
             }
             this.layout.selectedObject.updateElement()

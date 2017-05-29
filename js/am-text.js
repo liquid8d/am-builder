@@ -18,7 +18,7 @@ function AMText(x, y, width, height) {
         word_wrap: { label: 'word_wrap', type: 'bool', default: false },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ] },
         charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
-        style: { label: 'style', type: 'select', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
+        style: { label: 'style', type: 'multiselect', default: 'Style.Regular', values: [ 'Style.Bold', 'Style.Italic' ] },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
         font: { label: 'font', type: 'file', default: '', values: 'font' },

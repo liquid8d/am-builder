@@ -94,7 +94,7 @@ menu button { width: 100%; }
     flex-direction: column;
 }
 .list .item {
-    align-items: center; 
+    align-items: flex-start; 
     display: flex;
     flex-direction: row;
     color: #aaa;

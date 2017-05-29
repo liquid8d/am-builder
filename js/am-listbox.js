@@ -22,10 +22,11 @@ function AMListBox(x, y, width, height) {
         selbg_green: { label: 'selbg_green', type: 'range', default: 0, min: 0, max: 255 },
         selbg_blue: { label: 'selbg_blue', type: 'range', default: 255, min: 0, max: 255 },
         selbg_alpha: { label: 'selbg_alpha', type: 'range', default: 255, min: 0, max: 255 },
+        sel_style: { label: 'style', type: 'multiselect', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ]},
         charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
         font: { label: 'font', type: 'file', default: '', values: 'font' },
-        style: { label: 'style', type: 'select', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
+        style: { label: 'style', type: 'multiselect', default: 'Style.Regular', values: [ 'Style.Regular', 'Style.Bold', 'Style.Italic' ] },
         rows: { label: 'rows', type: 'number', default: 11 },
         format_string: { label: 'format_string', type: 'text', default: '[Title]' }
     }
@@ -68,8 +69,12 @@ function AMListBox(x, y, width, height) {
             li.style.pointerEvents = 'none'
             li.innerHTML = utils.magicTokens( this.values.format_string, i )
             if ( i == 0 ) {
-                li.style.backgroundColor = 'rgba(' + this.values.selbg_red + ',' + this.values.selbg_green + ',' + this.values.selbg_blue + ',' + this.values.selbg_alpha + ')'
-                li.style.color = 'rgba(' + this.values.sel_red + ',' + this.values.sel_green + ',' + this.values.sel_blue + ', ' + this.values.sel_alpha + ')'
+                var sel_alpha = ( this.values.sel_alpha > 0 ) ? this.values.sel_alpha / 255 : 0
+                var selbg_alpha = ( this.values.selbg_alpha > 0 ) ? this.values.selbg_alpha / 255 : 0
+                li.style.backgroundColor = 'rgba(' + this.values.selbg_red + ',' + this.values.selbg_green + ',' + this.values.selbg_blue + ',' + selbg_alpha + ')'
+                li.style.color = 'rgba(' + this.values.sel_red + ',' + this.values.sel_green + ',' + this.values.sel_blue + ', ' + sel_alpha + ')'
+                li.style.fontWeight = ( this.values.sel_style.indexOf('Style.Bold') > -1 ) ? 'bold' : 'normal'
+                li.style.fontStyle = ( this.values.sel_style.indexOf('Style.Italic') > -1 ) ? 'italic' : ''
             }
             this.el.appendChild(li)
         }
