@@ -33,6 +33,7 @@ function AMText(x, y, width, height) {
     //create the html element
     this.createElement = function() {
         this.el = document.createElement('span')
+        this.el.classList.add('text')
         this.el.style.overflow = 'hidden'
     }
 
