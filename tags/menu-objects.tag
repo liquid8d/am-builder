@@ -1,12 +1,24 @@
 <menu-objects>
     <style scoped>
         .list .item { cursor: pointer; }
+        input[type="text"] {
+            border: none;
+            background: #111;
+            color: #aaa;
+            padding: 2px;
+        }
+        input[readonly] {
+            background: transparent;
+        }
     </style>
     <div if="{ showObjects() }" class="list">
         <div each="{ item in layout.config.objects }" class="item" data-id="{ item.id }" onclick="{ selectObject }">
             <div class="icon { ( item.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
             <div class="icon { ( item.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
+            <input type="text" style="flex-grow: 1;" data-id="{item.id}" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
+            <!--
             <span style="flex-grow: 1; pointer-events: none;">{ item.label }</span>
+            -->
             <div class="icon trash" onclick="{ deleteObject }"></div>
         </div>
     </div>
@@ -15,6 +27,37 @@
     </div>
     <script>
         this.layout = null  //currently attached layout
+        this.editLabelEl = null
+
+        editLabelStart(e) {
+            console.log('edit label start')
+            this.editLabelEl = e.target
+            this.editLabelEl.removeAttribute('readonly')
+            //this.editLabelEl.focus(function() { this.select() })
+        }
+
+        editLabelEnd(e) {
+            var end = false
+            if ( e.type == 'keydown' && e.keyCode == 27 ) {
+                //cancel label edit on esc
+                var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
+                this.editLabelEl.value = obj.label
+                end = true
+            }
+            if ( this.editLabelEl ) {
+                if ( e.type == 'blur' || ( e.type == 'keydown' && e.keyCode == 13 ) ) {
+                    //submit label edit
+                    var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
+                    obj.label = this.editLabelEl.value
+                    end = true
+                }
+            }
+            //stop label editing
+            if ( end && this.editLabelEl ) {
+                this.editLabelEl.setAttribute('readonly', 'readonly')
+                this.editLabelEl = null
+            }
+        }
 
         //whether to show the objects list
         showObjects() {
