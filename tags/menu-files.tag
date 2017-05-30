@@ -138,9 +138,9 @@
                 if ( f.type == this.opts.file_type ) {
                     switch( f.type ) {
                         case 'font':
-                            console.log('adding font')
                             var style = document.getElementById('font-' + f.name)
                             if ( !style ) {
+                                console.log('adding font: ' + f.name)
                                 style = document.createElement('style')
                                 style.id = 'font-' + f.name
                                 style.innerHTML = '@font-face { font-family: \'' + f.name + '\'; src: local(\'☺\'), url(\'' + f.data + '\') format("opentype"); }'
