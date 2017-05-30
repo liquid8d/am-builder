@@ -133,22 +133,38 @@
             //preview.style.background = ''
         }
 
-        //set and monitor layout events
-        setLayout(layout) {
-            this.layout = layout
-            this.layout.on( 'file-added', function(f) {
+        updateFiles() {
+            this.layout.config.files.forEach(function(f) {
                 if ( f.type == this.opts.file_type ) {
                     switch( f.type ) {
                         case 'font':
                             console.log('adding font')
-                            var style = document.createElement('style')
-                            style.innerHTML = '@font-face { font-family: \'' + f.name + '\'; src: local(\'☺\'), url(\'' + f.data + '\') format("opentype"); }'
-                            document.head.appendChild(style)
+                            var style = document.getElementById('font-' + f.name)
+                            if ( !style ) {
+                                style = document.createElement('style')
+                                style.id = 'font-' + f.name
+                                style.innerHTML = '@font-face { font-family: \'' + f.name + '\'; src: local(\'☺\'), url(\'' + f.data + '\') format("opentype"); }'
+                                document.head.appendChild(style)
+                            }
                             break
                     }
                 }
-                this.update();
+            }.bind(this))
+        }
+
+        //set and monitor layout events
+        setLayout(layout) {
+            this.layout = layout
+            this.layout.on( 'file-update', function() {
+                this.updateFiles()
+                this.update()
+            }.bind(this))
+
+            this.layout.on( 'file-added', function(f) {
+                this.updateFiles()
+                this.update()
             }.bind(this) )
+
             this.update()
         }
 

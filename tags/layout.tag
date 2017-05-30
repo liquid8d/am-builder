@@ -8,6 +8,7 @@
             object-update
             file-added
             file-deleted
+            file-update
     -->
     <style>
         :scope {
@@ -145,6 +146,7 @@
         //save state of the layout
         save() {
             riot.mixin('utils').save('values', this.values)
+            riot.mixin('utils').save('files', this.config.files)
             //convert objects to standard JS object
             var objects = []
             this.config.objects.forEach(function(obj) {
@@ -175,6 +177,7 @@
         resume() {
             this.clear()
             this.values = riot.mixin('utils').load('values')
+            this.config.files = riot.mixin('utils').load('files')
             //recreate objects from standard JS object
             var objects = riot.mixin('utils').load('objects')
             objects.forEach(function(obj) {
@@ -185,6 +188,7 @@
                 this.addAMObject(newObj)
             }.bind(this))
             this.trigger('object-added')
+            this.trigger('file-update')
         }
 
         //add AM objects
