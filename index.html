@@ -12,27 +12,30 @@
         <script>
             var utils = riot.mixin('utils')
         </script>
+        <!-- AM object classes -->
         <script src="js/am-object.js"></script>
         <script src="js/am-text.js"></script>
         <script src="js/am-image.js"></script>
         <script src="js/am-artwork.js"></script>
         <script src="js/am-listbox.js"></script>
+        <!-- Workspace components -->
         <script src="tags/layout.tag" type="riot/tag"></script>
         <script src="tags/menu.tag" type="riot/tag"></script>
-        <script src="tags/menu-triggers.tag" type="riot/tag"></script>
+        <script src="tags/bar-top.tag" type="riot/tag"></script>
+        <script src="tags/bar-bottom.tag" type="riot/tag"></script>
+        <script src="tags/resizer.tag" type="riot/tag"></script>
         <!-- Design components -->
         <script src="tags/menu-tools.tag" type="riot/tag"></script>
         <script src="tags/menu-layout.tag" type="riot/tag"></script>
         <script src="tags/menu-props.tag" type="riot/tag"></script>
         <script src="tags/menu-objects.tag" type="riot/tag"></script>
         <script src="tags/menu-nav.tag" type="riot/tag"></script>
+        <script src="tags/menu-triggers.tag" type="riot/tag"></script>
+        <!-- File Manager components -->
+        <script src="tags/menu-files.tag" type="riot/tag"></script>
         <!-- Dev components -->
         <script src="tags/menu-data.tag" type="riot/tag"></script>
-        <!-- Shared components -->
-        <script src="tags/menu-files.tag" type="riot/tag"></script>
-        <script src="tags/bar-top.tag" type="riot/tag"></script>
-        <script src="tags/bar-bottom.tag" type="riot/tag"></script>
-        <script src="tags/resizer.tag" type="riot/tag"></script>
+        <!-- Styles -->
         <link href="css/style.css" rel="stylesheet"></link>
         <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet">
     </head>
@@ -44,12 +47,14 @@
                 <div class="vertical-toolbar left" style="padding: 0;">
                     <ul class="tabs">
                         <li class="tab selected" data-tab="menu-design"><div class="icon design" data-menu="menu-design" title="Design" onclick="toggleMenu(event)"></div></li>
+                        <li class="tab" data-tab="menu-filemgr"><div class="icon folder" data-menu="menu-filemgr" title="Files" onclick="toggleMenu(event)"></div></li>
                         <li class="tab" data-tab="menu-settings"><div class="icon settings" data-menu="menu-settings" title="Settings" onclick="toggleMenu(event)"></div></li>
                         <li class="tab" data-tab="menu-dev"><div class="icon dev" title="Dev" data-menu="menu-dev" onclick="toggleMenu(event)"></div></li>
                     </ul>
                 </div>
                 <div class="menus">
                     <menu id="menu-design"></menu>
+                    <menu id="menu-filemgr" style="display: none;"></menu>
                     <menu id="menu-settings" style="display: none;">Settings here</menu>
                     <menu id="menu-dev" style="display: none;"></menu>
                 </div>
@@ -73,7 +78,7 @@
                 }
             })
 
-            var layout, barTop, barBottom, designMenu, settingsMenu, devMenu, menuData, menuTools, menuLayout, menuProps, menuObjects, menuNav, menuTriggers, menuMedia, menuFonts, menuShaders
+            var layout, barTop, barBottom, designMenu, fileMgrMenu, settingsMenu, devMenu, menuData, menuTools, menuLayout, menuProps, menuObjects, menuNav, menuTriggers, menuMedia, menuFonts, menuShaders
             riot.compile(function() {
                 //setup design menu
                 designMenu = riot.mount('#menu-design')[0]
@@ -86,9 +91,6 @@
                         { label: 'Navigate', foldable: true, content: '<menu-nav></menu-nav>' },
                         { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
                         { label: 'Triggers', foldable: true, content: '<menu-triggers></menu-triggers>' },
-                        { label: 'Media', foldable: true, content: '<menu-files id="menu-media" allowed="image/*" file_type="media" drop_msg="Drag your media here"></menu-files>'},
-                        { label: 'Fonts', foldable: true, content: '<menu-files id="menu-fonts" allowed=".ttf,.otf" file_type="font" drop_msg="Drag your fonts here"></menu-files>' },
-                        { label: 'Shaders', foldable: true, content: '<menu-files id="menu-shaders" allowed=".vert,.frag" file_type="shader" drop_msg="Drag your shaders here"></menu-files>' },
                     ]
                 })
 
@@ -99,10 +101,21 @@
                 menuObjects = riot.mount('menu-objects')[0]
                 menuNav = riot.mount('menu-nav')[0]
                 menuTriggers = riot.mount('menu-triggers')[0]
+                
+                fileMgrMenu = riot.mount('#menu-filemgr')[0]
+                fileMgrMenu.setMenu({
+                    accordian: false,
+                    items: [
+                        { label: 'Media', foldable: true, expand: true, content: '<menu-files id="menu-media" allowed="image/*" file_type="media" drop_msg="Drag your media here"></menu-files>'},
+                        { label: 'Fonts', foldable: true, content: '<menu-files id="menu-fonts" allowed=".ttf,.otf" file_type="font" drop_msg="Drag your fonts here"></menu-files>' },
+                        { label: 'Shaders', foldable: true, content: '<menu-files id="menu-shaders" allowed=".vert,.frag" file_type="shader" drop_msg="Drag your shaders here"></menu-files>' },
+                    ]
+                })
+                //mount file mgr components
                 menuMedia = riot.mount('#menu-media')[0]
                 menuFonts = riot.mount('#menu-fonts')[0]
                 menuShaders = riot.mount('#menu-shaders')[0]
-                
+
                 //setup settings menu
                 settingsMenu = riot.mount('#menu-settings')[0]
                 settingsMenu.setMenu({
