@@ -1,6 +1,7 @@
 <bar-bottom>
     <button onclick="{showCode}">View Code</button>
     <button if="{layout}" onclick="{layout.createZip}">Download ZIP</button>
+    <button if="{layout}" onclick="{layout.clear}">Clear</button>
     <button if="{layout}" onclick="{layout.save}">Save</button>
     <button if="{layout}" onclick="{layout.resume}">Resume</button>
     <div id="msg1" style="margin: 0 1em 0 1em; font-size: 12px;"></div>
