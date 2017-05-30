@@ -4,7 +4,6 @@ function AMImage() {
     //set defaults
     this.type = 'AMImage'
     this.label = 'Image'
-    this.values.isArtwork = false
 
     var props = {
         file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
