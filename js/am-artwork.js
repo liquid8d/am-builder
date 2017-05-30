@@ -6,7 +6,7 @@ function AMArtwork() {
     this.label = 'Artwork'
 
     var props = {
-        file_name: { label: 'file_name', type: 'dropdown', default: 'snap', values: [ 'fanart', 'flyer', 'marquee', 'snap', 'video', 'wheel' ] },
+        file_name: { label: 'file_name', type: 'dropdown', default: 'snap', values: [ 'flyer', 'marquee', 'snap', 'wheel', 'fanart' ] },
         red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
         green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
         blue: { label: 'blue', type: 'range', default: 255, min: 0, max: 255 },
