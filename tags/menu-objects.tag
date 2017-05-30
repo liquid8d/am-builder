@@ -30,7 +30,6 @@
         this.editLabelEl = null
 
         editLabelStart(e) {
-            console.log('edit label start')
             this.editLabelEl = e.target
             this.editLabelEl.removeAttribute('readonly')
             //this.editLabelEl.focus(function() { this.select() })
@@ -38,13 +37,13 @@
 
         editLabelEnd(e) {
             var end = false
-            if ( e.type == 'keydown' && e.keyCode == 27 ) {
-                //cancel label edit on esc
-                var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
-                this.editLabelEl.value = obj.label
-                end = true
-            }
             if ( this.editLabelEl ) {
+                if ( e.type == 'keydown' && e.keyCode == 27 ) {
+                    //cancel label edit on esc
+                    var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
+                    this.editLabelEl.value = obj.label
+                    end = true
+                }
                 if ( e.type == 'blur' || ( e.type == 'keydown' && e.keyCode == 13 ) ) {
                     //submit label edit
                     var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
