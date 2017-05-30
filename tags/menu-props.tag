@@ -4,16 +4,25 @@
         .list { width: 100%; }
         input[type="number"] { width: 50px; }
         .item > input[type="text"] { width: 100px; }
+        .multiselect {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
     <div if="{ showProps() }" class="list">
         <div class="item" each="{ prop, key in layout.selectedObject.props }">
             <label style="flex-grow:1;">{prop.label}</label>
             <!-- text property -->
-            <input if="{ prop.type=='text' }" type="text" value="{ layout.selectedObject.values[key] || '' }" onchange="{ updateProps }" />
+            <input if="{ prop.type =='text' }" type="text" value="{ layout.selectedObject.values[key] || '' }" onchange="{ updateProps }" />
             <!-- number property -->
             <input if="{ prop.type == 'number' }" size="{prop.size||3}" type="number" min="{prop.min}" max="{prop.max}" value="{layout.selectedObject.values[key]}" onchange="{ updateProps }" />
             <!-- boolean property -->
-            <input if="{ prop.type=='bool' }" type="checkbox" checked="{ layout.selectedObject.values[key] || false }" onclick="{ updateProps }" />
+            <input if="{ prop.type =='bool' }" type="checkbox" checked="{ layout.selectedObject.values[key] || false }" onclick="{ updateProps }" />
+            <!-- range -->
+            <div if="{ prop.type == 'range' }" style="display: flex; flex-direction: column;">
+                <input type="range" min="{ prop.min }" max="{ prop.max }" step="{ prop.step || 1 }" value="{ layout.selectedObject.values[key] || prop.default }" oninput="{ updateProps }" />
+                <label>{ layout.selectedObject.values[key] }</label>
+            </div>
             <!-- select property -->
             <select if="{ prop.type=='select' }" onchange="{ updateProps }">
                 <option if="{ typeof prop.values != 'string' }" each="{ val in prop.values }" selected="{ layout.selectedObject.values[key] == val }">{val}</option>
@@ -33,6 +42,10 @@
                     <option></option>
                     <option each="{ file in layout.config.files }" if="{ file.type == prop.values }" value="{file.name}">{file.name}</option>
                 </select>
+            </div>
+            <!-- multiselect property -->
+            <div if="{ prop.type == 'multiselect' }" class="multiselect" onclick="{updateProps}">
+                <label each="{ option in prop.values }" for="{option.label}"><input type="checkbox" value="{ option.value }" checked="{ option.checked.includes(layout.selectedObject.values[key]) }" onclick="{this.parent.click}" />{ option.label }</label>
             </div>
         </div>
     </div>
@@ -55,6 +68,9 @@
                 case 'text':
                     this.layout.selectedObject.values[e.item.key] = e.target.value
                     break
+                case 'range':
+                    this.layout.selectedObject.values[e.item.key] = parseInt(e.target.value)
+                    break
                 case 'select':
                     this.layout.selectedObject.values[e.item.key] = e.target.selectedOptions[0].value
                     break
@@ -73,6 +89,13 @@
                     } else {
                         this.layout.selectedObject.values[e.item.key] = e.target.value
                     }
+                    break
+                case 'multiselect':
+                    var flags = 0
+                    var options = e.target.parentElement.parentElement.querySelectorAll('input')
+                    for ( var i = 0; i < options.length; i++ )
+                        if ( options[i].checked ) flags += parseInt(options[i].value)
+                    this.layout.selectedObject.values[e.item.key] = flags
                     break
             }
             this.layout.selectedObject.updateElement()

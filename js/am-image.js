@@ -8,10 +8,10 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     var props = {
         file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
-        red: { label: 'red', type: 'number', default: 255, min: 0, max: 255 },
-        green: { label: 'green', type: 'number', default: 255, min: 0, max: 255 },
-        blue: { label: 'blue', type: 'number', default: 255, min: 0, max: 255 },
-        alpha: { label: 'alpha', type: 'number', default: 255, min: 0, max: 255 },
+        red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
+        green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
+        blue: { label: 'blue', type: 'range', default: 255, min: 0, max: 255 },
+        alpha: { label: 'alpha', type: 'range', default: 255, min: 0, max: 255 },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
         skew_x: { label: 'skew_x', type: 'number', default: 0 },
@@ -24,7 +24,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
         subimg_height: { label: 'subimg_height', type: 'number', default: 0 },
         origin_x: { label: 'origin_x', type: 'number', default: 0 },
         origin_y: { label: 'origin_y', type: 'number', default: 0 },
-        video_flags: { label: 'video_flags', type: 'select', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
+        video_flags: { label: 'video_flags', type: 'multiselect', default: 0, values: [ { label: 'ImagesOnly', value: 1, checked: [1,3,5,7,9,11,13,15] }, { label: 'NoLoop', value: 2, checked: [2,3,6,7,10,11,14,15] }, { label: 'NoAutoStart', value: 4, checked: [4,5,6,7,12,13,14,15] }, { label: 'NoAudio', value: 8, checked: [8,9,10,11,12,13,14,15] }] },
         video_playing: { label: 'video_playing', type: 'bool', default: false },
         preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
         smooth: { label: 'smooth', type: 'bool', default: false },
@@ -39,8 +39,8 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.createElement = function() {
         this.el = document.createElement('div')
-        this.el.classList.add('image')
-        this.el.style.backgroundRepeat = 'no-repeat'
+        this.el.classList.add('artwork')
+        this.el.style.textAlign = 'center'
 
         if ( this.isArtwork ) {
             console.log('adding artwork' )
@@ -61,14 +61,42 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        var file = layout.findFile(this.values.file_name, 'name')
-        var url = ( file ) ? file.data : ''
-        if ( data && this.isArtwork ) {
+        if ( this.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
-            url = 'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png'
+            var video = this.el.querySelector('video')
+            if ( video ) this.el.removeChild(video)
+            //if video_playing is enabled or if the ImagesOnly flag is set
+            if ( this.values.video_playing && !props.video_flags.values[0].checked.includes(this.values.video_flags) ) {
+                //add a video element for artwork video
+                var video = document.createElement('video')
+                    video.src = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
+                    video.setAttribute('type', 'video/mp4')
+                    video.style.pointerEvents = 'none'
+                    video.style.width = '100%'
+                    video.style.height = '100%'
+                    video.style.objectFit = ( this.values.preserve_aspect_ratio ) ? 'contain' : 'fill'
+                    //if not noloop
+                    if ( !props.video_flags.values[1].checked.includes(this.values.video_flags) ) video.setAttribute('loop', true)
+                    //if not noautostart
+                    if ( !props.video_flags.values[2].checked.includes(this.values.video_flags) ) video.setAttribute('autoplay', true)
+                    //if noaudio
+                    if ( props.video_flags.values[3].checked.includes(this.values.video_flags) ) video.setAttribute('muted', true)
+                this.el.style.backgroundImage = ''
+                this.el.appendChild(video)
+            } else {
+                //artwork images
+                this.el.style.backgroundImage = 'url(\'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png\')'
+            }
+        } else {
+            //standard images
+            var file = layout.findFile(this.values.file_name, 'name')
+            this.el.style.backgroundImage = ( file ) ? 'url(\'' + file.data + '\')' : ''
         }
-        this.el.style.backgroundImage = 'url(\'' + url + '\')'
+        
+        this.el.style.backgroundRepeat = 'no-repeat'
+        this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : '0 0'
+        this.el.style.backgroundSize = ( this.values.preserve_aspect_ratio ) ? 'contain' : '100% 100%'
         
         //colorize image with svg filter
         var red = (this.values.red / 255 ) || 0
@@ -79,13 +107,6 @@ function AMImage(file_name,x, y, width, height, artwork) {
         
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.opacity = alpha
-        if ( this.values.preserve_aspect_ratio ) {
-            this.el.style.backgroundSize = ''
-            this.el.style.backgroundPosition = 'center'
-        } else {
-            this.el.style.backgroundPosition = ''
-            this.el.style.backgroundSize = '100% 100%'
-        }
         this.el.draggable = false
     }
 

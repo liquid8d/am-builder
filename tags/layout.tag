@@ -25,18 +25,15 @@
             background: linear-gradient(rgb(5,5,5),rgb(15,15,15),rgb(5,5,5));
         }
         .gridlines {
-            position: absolute;
-            width: 100%;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo2Y2IyOTE4NC0wMjU3LTRhNDYtYWQzNS03YjY0N2MyZmM4OWUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzE1MDFEQTc0NDBEMTFFN0ExRTQ4QzZDRTM0RjEwRTMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzE1MDFEQTY0NDBEMTFFN0ExRTQ4QzZDRTM0RjEwRTMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MDMyNTQ4ZTktZTNkZi00ZjQwLWI0OTEtN2MzNjA1YmE4ZmUxIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjZjYjI5MTg0LTAyNTctNGE0Ni1hZDM1LTdiNjQ3YzJmYzg5ZSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PoE/vRoAAAAMUExURSEtSCAgIA8PDwAAAOlHyb4AAABgSURBVHja7NUhDgAhDEXBttz/zig0NAHUVK0hI15+Nsa6OvzK9osICASyR6p72X6hCQRi8ZpAIBavCQRi8cJDIJeQfH+aQCD+8ZpAIBavCQRi8cJDIBYvPATSRn7cFGAAf4RrcmCdlfgAAAAASUVORK5CYII=') repeat;
             height: 100%;
-            background-color: transparent;
-            background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
-            background-position: -7px -19px;
-            background-size: 25px 25px;
+            pointer-events: none;
         }
 
         .object {
             position: absolute;
             font-family: Arial;
+            pointer-events: all;
         }
         .object.image {
             background-size: contain;
@@ -55,7 +52,8 @@
             editor: {
                 zoom: 100,
                 gridlines: true,
-                snap: true
+                snap: true,
+                snapSize: 10
             },
             globals: {
                 width: { label: 'width', type: 'number', default: 640 },
@@ -108,12 +106,14 @@
         next_display() {
             data.displayIndex = ( data.displayIndex < data.displays.length - 1 ) ? data.displayIndex + 1 : 0
             data.listIndex = 0
+            data.filterIndex = 0
             console.log('next_display: ' + data.displayIndex )
             this.updateElements()
         }
         prev_display() {
             data.displayIndex = ( data.displayIndex > 0 ) ? data.displayIndex - 1 : data.displays.length - 1
             data.listIndex = 0
+            data.filterIndex = 0
             console.log('prev_display: ' + data.displayIndex )
             this.updateElements()
         }
@@ -127,6 +127,18 @@
             var currentDisplay = data.displays[data.displayIndex]
             data.listIndex = ( data.listIndex > 0 ) ? data.listIndex - 1 : currentDisplay.romlist.length - 1
             console.log('prev_rom: ' + data.listIndex )
+            this.updateElements()
+        }
+        next_filter() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.filterIndex = ( data.filterIndex < currentDisplay.filters.length - 1 ) ? data.filterIndex + 1 : 0
+            console.log('next_filter: ' + data.filterIndex )
+            this.updateElements()
+        }
+        prev_filter() {
+            var currentDisplay = data.displays[data.displayIndex]
+            data.filterIndex = ( data.filterIndex > 0 ) ? data.filterIndex - 1 : currentDisplay.filters.length - 1
+            console.log('prev_filter: ' + data.filterIndex )
             this.updateElements()
         }
 
@@ -250,24 +262,21 @@
                         endOnly: true,
                         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
                     },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
-                .on('dragmove', function(event) {
+                .on('dragmove', function(e) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                    var left = event.target.offsetLeft + event.dx
-                    var top = event.target.offsetTop + event.dy
-                    
-                    event.target.style.left = left + 'px'
-                    event.target.style.top = top + 'px'
-
-                    this.selectedObject.values.x = left
-                    this.selectedObject.values.y = top
-                    this.trigger('object-update')
+                        var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                        var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
+                            y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
+                            this.selectedObject.el.style.left = x + 'px'
+                            this.selectedObject.el.style.top = y + 'px'
+                        this.trigger('object-update')
                 }.bind(this))
                 .resizable({
                     preserveAspectRatio: false,
                     edges: { left: true, right: true, bottom: true, top: true },
-                    snap: { targets: [ interact.createSnapGrid({ x: 25, y: 25 }) ], range: Infinity }
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('resizemove', function(event) {
                     if ( !this.selectedObject || this.selectedObject.locked ) return
@@ -351,9 +360,6 @@
                             .replace('"Align.Left"', 'Align.Left')
                             .replace('"Align.Centre"', 'Align.Centre')
                             .replace('"Align.Left"', 'Align.Right')
-                            .replace('"Style.Regular"', 'Style.Regular')
-                            .replace('"Style.Bold"', 'Style.Bold')
-                            .replace('"Style.Left"', 'Style.Italic')
                         code += ( objCount < this.config.objects.length ) ? ',\n' : '\n'
                     }
                 }.bind(this))
@@ -411,8 +417,8 @@
         }
 
         setZoom(per) {
-            var layout = this.root.querySelector('.layout')
-            layout.style.zoom = per + '%'
+            //this.root.style.zoom = scale
+            this.root.querySelector('.layout').style.zoom = per + '%'
             this.config.editor.zoom = per
         }
 
@@ -432,5 +438,13 @@
             }
         }
 
+        this.on('mount', function() {
+            this.root.querySelector('.layout').onmousemove = function(e) {
+                var scale = ( this.config.editor.zoom / 100 )
+                var x = e.layerX / scale,
+                    y = e.layerY / scale
+                barBottom.setMessage(1, 'x: ' + x + ' y: ' + y )
+            }.bind(this)
+        })
     </script>
 </layout>

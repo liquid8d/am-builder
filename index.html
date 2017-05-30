@@ -18,12 +18,16 @@
         <script src="js/am-listbox.js"></script>
         <script src="tags/layout.tag" type="riot/tag"></script>
         <script src="tags/menu.tag" type="riot/tag"></script>
+        <script src="tags/menu-triggers.tag" type="riot/tag"></script>
+        <!-- Design components -->
         <script src="tags/menu-tools.tag" type="riot/tag"></script>
         <script src="tags/menu-layout.tag" type="riot/tag"></script>
         <script src="tags/menu-props.tag" type="riot/tag"></script>
         <script src="tags/menu-objects.tag" type="riot/tag"></script>
+        <script src="tags/menu-nav.tag" type="riot/tag"></script>
+        <!-- Dev components -->
         <script src="tags/menu-data.tag" type="riot/tag"></script>
-        <script src="tags/menu-triggers.tag" type="riot/tag"></script>
+        <!-- Shared components -->
         <script src="tags/menu-files.tag" type="riot/tag"></script>
         <script src="tags/bar-top.tag" type="riot/tag"></script>
         <script src="tags/bar-bottom.tag" type="riot/tag"></script>
@@ -68,7 +72,7 @@
                 }
             })
 
-            var layout, barTop, barBottom, designMenu, settingsMenu, devMenu, menuTools, menuLayout, menuProps, menuObjects, menuData, menuTriggers, menuMedia, menuFonts, menuShaders
+            var layout, barTop, barBottom, designMenu, settingsMenu, devMenu, menuData, menuTools, menuLayout, menuProps, menuObjects, menuNav, menuTriggers, menuMedia, menuFonts, menuShaders
             riot.compile(function() {
                 //setup design menu
                 designMenu = riot.mount('#menu-design')[0]
@@ -78,7 +82,7 @@
                         { label: 'Tools', content: '<menu-tools></menu-tools>' },
                         { label: 'Objects', expand: true, foldable: true, maxHeight: '160px', content: '<menu-objects></menu-objects>' },
                         { label: 'Properties', expand: false, foldable: true, maxHeight: '240px', content: '<menu-props></menu-props>' },
-                        { label: 'Data', foldable: true, content: '<menu-data></menu-data>' },
+                        { label: 'Navigate', foldable: true, content: '<menu-nav></menu-nav>' },
                         { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
                         { label: 'Triggers', foldable: true, content: '<menu-triggers></menu-triggers>' },
                         { label: 'Media', foldable: true, content: '<menu-files id="menu-media" allowed="image/*" file_type="media" drop_msg="Drag your media here"></menu-files>'},
@@ -92,10 +96,8 @@
                 menuLayout = riot.mount('menu-layout')[0]
                 menuProps = riot.mount('menu-props')[0]
                 menuObjects = riot.mount('menu-objects')[0]
-                menuData = riot.mount('menu-data')[0]
+                menuNav = riot.mount('menu-nav')[0]
                 menuTriggers = riot.mount('menu-triggers')[0]
-                barTop = riot.mount('bar-top')[0]
-                barBottom = riot.mount('bar-bottom')[0]
                 menuMedia = riot.mount('#menu-media')[0]
                 menuFonts = riot.mount('#menu-fonts')[0]
                 menuShaders = riot.mount('#menu-shaders')[0]
@@ -115,14 +117,22 @@
                     accordian: false,
                     items: [
                         { 
+                            label: 'Dev tools',
                             content: '<button onclick="console.dir(layout)">Output Layout</button>' +
                             '<button onclick="console.table(data.displays)">Output Displays</button>' +
                             '<button onclick="console.table(data.displays[data.displayIndex].romlist)">Output Current Romlist</button>' +
                             '<button onclick="console.table(layout.config.files)">Output Files</button>' +
                             '<button onclick="console.dir(layout.selectedObject)">Output SelectedObject</button>'
                         },
+                        {
+                            label: 'Data',
+                            content: '<menu-data></menu-data>'
+                        }
                     ]
                 })
+
+                //mount dev components
+                menuData = riot.mount('menu-data')[0]
 
                 //hook up menu resizer
                 var menuResizer = riot.mount('resizer')[0]
@@ -135,11 +145,15 @@
                 
                 //mount layout and hook components to the layout
                 layout = riot.mount('layout')[0]
+                barTop = riot.mount('bar-top')[0]
+                barBottom = riot.mount('bar-bottom')[0]
+
                 barTop.setLayout(layout)
                 barBottom.setLayout(layout)
                 menuLayout.setLayout(layout)
                 menuProps.setLayout(layout)
                 menuObjects.setLayout(layout)
+                menuNav.setLayout(layout)
                 menuData.setLayout(layout)
                 menuMedia.setLayout(layout)
                 menuFonts.setLayout(layout)

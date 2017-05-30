@@ -12,6 +12,10 @@
                 if ( !this.layout.selectedObject ) return
                 this.setMessage( 2, this.layout.selectedObject.type + ': ' + this.layout.selectedObject.values.x + 'x' + this.layout.selectedObject.values.y + ' ' + this.layout.selectedObject.values.width + 'x' + this.layout.selectedObject.values.height )
             }.bind(this))
+            this.layout.on('object-update', function() {
+                if ( !this.layout.selectedObject ) return
+                this.setMessage( 2, this.layout.selectedObject.type + ': ' + this.layout.selectedObject.values.x + 'x' + this.layout.selectedObject.values.y + ' ' + this.layout.selectedObject.values.width + 'x' + this.layout.selectedObject.values.height )
+            }.bind(this))
             this.layout.on('object-deselected', function() {
                 this.setMessage(2, '')
             }.bind(this))
