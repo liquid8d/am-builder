@@ -18,7 +18,7 @@ function AMText(x, y, width, height) {
         word_wrap: { label: 'word_wrap', type: 'bool', default: false },
         align: { label: 'align', type: 'select', default: 'Align.Left', values: [ 'Align.Left', 'Align.Centre', 'Align.Right' ] },
         charsize: { label: 'charsize', type: 'number', default: 16, min: -1, max: 100 },
-        style: { label: 'style', type: 'multiselect', default: 'Style.Regular', values: [ 'Style.Bold', 'Style.Italic' ] },
+        style: { label: 'style', type: 'multiselect', default: 0, values: [ { label: 'Bold', value: 1, checked: [ 1,3,5,7 ] }, { label: 'Italic', value: 2, checked: [2,3,6,7] }, { label: 'Underlined', value: 4, checked: [4,5,6,7] } ] },
         index_offset: { label: 'index_offset', type: 'number', default: 0 },
         filter_offset: { label: 'filter_offset', type: 'number', default: 0 },
         font: { label: 'font', type: 'file', default: '', values: 'font' },
@@ -56,9 +56,9 @@ function AMText(x, y, width, height) {
         this.el.style.fontSize = ( this.values.charsize != -1 ) ? this.values.charsize + 'px' : '100vh'
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         this.el.style.whiteSpace = ( this.values.word_wrap ) ? 'normal' : 'nowrap'
-        this.el.style.fontWeight = ( this.values.style.indexOf('Style.Bold') > -1 ) ? 'bold' : 'normal'
-        this.el.style.fontStyle = ( this.values.style.indexOf('Style.Italic') > -1 ) ? 'italic' : ''
-        if ( this.values.style.indexOf('Style.Underlined') > -1 ) this.el.style.textDecoration = 'underline'
+        this.el.style.fontWeight = ( props.style.values[0].checked.includes(this.values.style) ) ? 'bold' : 'normal'
+        this.el.style.fontStyle = ( props.style.values[1].checked.includes(this.values.style) ) ? 'italic' : ''
+        this.el.style.textDecoration = ( props.style.values[2].checked.includes(this.values.style) ) ? 'underline' : ''
     }
 
     //export object to squirrel code

@@ -360,9 +360,6 @@
                             .replace('"Align.Left"', 'Align.Left')
                             .replace('"Align.Centre"', 'Align.Centre')
                             .replace('"Align.Left"', 'Align.Right')
-                            .replace('"Style.Regular"', 'Style.Regular')
-                            .replace('"Style.Bold"', 'Style.Bold')
-                            .replace('"Style.Left"', 'Style.Italic')
                         code += ( objCount < this.config.objects.length ) ? ',\n' : '\n'
                     }
                 }.bind(this))

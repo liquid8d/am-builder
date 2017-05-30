@@ -24,7 +24,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
         subimg_height: { label: 'subimg_height', type: 'number', default: 0 },
         origin_x: { label: 'origin_x', type: 'number', default: 0 },
         origin_y: { label: 'origin_y', type: 'number', default: 0 },
-        video_flags: { label: 'video_flags', type: 'multiselect', default: 'Vid.Default', values: [ 'Vid.Default', 'Vid.NoAudio', 'Vid.NoAutoStart', 'Vid.NoLoop' ] },
+        video_flags: { label: 'video_flags', type: 'multiselect', default: 0, values: [ { label: 'ImagesOnly', value: 1, checked: [1,3,5,7,9,11,13,15] }, { label: 'NoLoop', value: 2, checked: [2,3,6,7,10,11,14,15] }, { label: 'NoAutoStart', value: 4, checked: [4,5,6,7,12,13,14,15] }, { label: 'NoAudio', value: 8, checked: [8,9,10,11,12,13,14,15] }] },
         video_playing: { label: 'video_playing', type: 'bool', default: false },
         preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
         smooth: { label: 'smooth', type: 'bool', default: false },
@@ -66,7 +66,8 @@ function AMImage(file_name,x, y, width, height, artwork) {
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
             var video = this.el.querySelector('video')
             if ( video ) this.el.removeChild(video)
-            if ( this.values.video_playing ) {
+            //if video_playing is enabled or if the ImagesOnly flag is set
+            if ( this.values.video_playing && !props.video_flags.values[0].checked.includes(this.values.video_flags) ) {
                 //add a video element for artwork video
                 var video = document.createElement('video')
                     video.src = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
@@ -75,9 +76,12 @@ function AMImage(file_name,x, y, width, height, artwork) {
                     video.style.width = '100%'
                     video.style.height = '100%'
                     video.style.objectFit = ( this.values.preserve_aspect_ratio ) ? 'contain' : 'fill'
-                    if ( this.values.video_flags.indexOf('Vid.Default') > -1 || this.values.video_flags.indexOf('Vid.NoAutoStart') == -1 ) video.setAttribute('autoplay', true)
-                    if ( this.values.video_flags.indexOf('Vid.Default') > -1 || this.values.video_flags.indexOf('Vid.NoLoop') == -1 ) video.setAttribute('loop', true)
-                    if ( this.values.video_flags.indexOf('Vid.NoAudio') > -1 ) video.setAttribute('muted', true)
+                    //if not noloop
+                    if ( !props.video_flags.values[1].checked.includes(this.values.video_flags) ) video.setAttribute('loop', true)
+                    //if not noautostart
+                    if ( !props.video_flags.values[2].checked.includes(this.values.video_flags) ) video.setAttribute('autoplay', true)
+                    //if noaudio
+                    if ( props.video_flags.values[3].checked.includes(this.values.video_flags) ) video.setAttribute('muted', true)
                 this.el.style.backgroundImage = ''
                 this.el.appendChild(video)
             } else {

@@ -45,7 +45,7 @@
             </div>
             <!-- multiselect property -->
             <div if="{ prop.type == 'multiselect' }" class="multiselect" onclick="{updateProps}">
-                <label each="{ option in prop.values }" for="{option}"><input type="checkbox" value="{ option }" onclick="{this.parent.click}" checked="{ layout.selectedObject.values[key].indexOf(option) > -1 }" />{ option }</label>
+                <label each="{ option in prop.values }" for="{option.label}"><input type="checkbox" value="{ option.value }" checked="{ option.checked.includes(layout.selectedObject.values[key]) }" onclick="{this.parent.click}" />{ option.label }</label>
             </div>
         </div>
     </div>
@@ -91,11 +91,10 @@
                     }
                     break
                 case 'multiselect':
-                    var flags = ''
+                    var flags = 0
                     var options = e.target.parentElement.parentElement.querySelectorAll('input')
                     for ( var i = 0; i < options.length; i++ )
-                        if ( options[i].checked )
-                            flags += ( flags == '' ) ? options[i].value : '|' + options[i].value
+                        if ( options[i].checked ) flags += parseInt(options[i].value)
                     this.layout.selectedObject.values[e.item.key] = flags
                     break
             }
