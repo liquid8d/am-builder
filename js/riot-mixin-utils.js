@@ -2,15 +2,11 @@ riot.mixin('utils', {
     save : function (id, what) {
         if ( localStorage )
             localStorage.setItem( id, JSON.stringify( what ) )
-        console.log('saved ' + id + ':')
-        console.dir(what)
     },
     load: function (id) {
         var val = null
         if ( localStorage && localStorage.getItem(id) )
             val = JSON.parse( localStorage.getItem(id) )
-        console.log('loading ' + id + ':')
-        console.dir(val)
         return val
     },
     //this allows you to colorize images with rgb values by adding filter: url(#idFromHere) to the image

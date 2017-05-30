@@ -4,8 +4,8 @@
     </style>
     <div if="{ showObjects() }" class="list">
         <div each="{ item in layout.config.objects }" class="item" data-id="{ item.id }" onclick="{ selectObject }">
-            <div class="icon show" onclick="{ toggleVisible }"></div>
-            <div class="icon unlock" onclick="{ toggleLock }"></div>
+            <div class="icon { ( item.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
+            <div class="icon { ( item.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
             <span style="flex-grow: 1; pointer-events: none;">{ item.label }</span>
             <div class="icon trash" onclick="{ deleteObject }"></div>
         </div>
@@ -56,10 +56,10 @@
         //toggle the clicked objects visibility in the layout
         toggleVisible(e) {
             var clickedObject = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
-            if ( clickedObject ) clickedObject.values.visible = !clickedObject.values.visible
+            if ( clickedObject ) clickedObject.hidden = !clickedObject.hidden
             clickedObject.updateElement()
             this.layout.trigger('object-update')
-            if ( clickedObject.values.visible ) {
+            if ( clickedObject.hidden ) {
                 e.target.classList.remove('hide')
                 e.target.classList.add('show')
             } else {

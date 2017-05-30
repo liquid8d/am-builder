@@ -44,7 +44,7 @@ function AMText(x, y, width, height) {
         this.el.style.top = this.values.y + 'px'
         this.el.style.width = this.values.width + 'px'
         this.el.style.height = this.values.height + 'px'
-        this.el.style.display = ( this.values.visible ) ? ( this.values.word_wrap ) ? 'inline-block' : 'block' : 'none'
+        this.el.style.display = ( this.values.visible && !this.hidden ) ? ( this.values.word_wrap ) ? 'inline-block' : 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         this.el.style.transformOrigin = '0 0'
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0

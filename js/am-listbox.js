@@ -1,5 +1,5 @@
-function AMListBox(x, y, width, height) {
-    AMObject.call(this, x, y, width, height)
+function AMListBox() {
+    AMObject.call(this)
 
     //set defaults
     this.type = 'AMListBox'
@@ -51,7 +51,7 @@ function AMListBox(x, y, width, height) {
         this.el.style.top = this.values.y + 'px'
         this.el.style.width = this.values.width + 'px'
         this.el.style.height = this.values.height + 'px'
-        this.el.style.display = ( this.values.visible ) ? 'block' : 'none'
+        this.el.style.display = ( this.values.visible && !this.hidden ) ? 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.color = 'rgba(' + this.values.red + ',' + this.values.green + ',' + this.values.blue + ', ' + alpha + ')'

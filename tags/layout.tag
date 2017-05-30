@@ -142,6 +142,51 @@
             this.updateElements()
         }
 
+        //save state of the layout
+        save() {
+            riot.mixin('utils').save('values', this.values)
+            //convert objects to standard JS object
+            var objects = []
+            this.config.objects.forEach(function(obj) {
+                var saveObj = {
+                    id: obj.id,
+                    label: obj.label,
+                    locked: obj.locked,
+                    hidden: obj.hidden,
+                    type: obj.type,
+                    aspect_values: obj.aspect_values,
+                    values: obj.values
+                }
+                objects.push(saveObj)
+            })
+            riot.mixin('utils').save('objects', objects)
+        }
+
+        //clear the layout of objects
+        clear() {
+            this.root.querySelector('.layout').querySelectorAll('.object').forEach(function(el) {
+                this.deleteObject(this.findObjectByEl(el))
+            }.bind(this))
+            this.update()
+            this.trigger('object-deleted')
+        }
+
+        //restore state of the layout
+        resume() {
+            this.clear()
+            this.values = riot.mixin('utils').load('values')
+            //recreate objects from standard JS object
+            var objects = riot.mixin('utils').load('objects')
+            objects.forEach(function(obj) {
+                var newObj = new window[obj.type]()
+                Object.keys(obj).forEach(function(key) {
+                    newObj[key] = obj[key]
+                })
+                this.addAMObject(newObj)
+            }.bind(this))
+            this.trigger('object-added')
+        }
+
         //add AM objects
         addAMObject(obj) {
             if ( !obj ) return
@@ -161,6 +206,7 @@
 
             this.select(obj.el)
             this.trigger('object-added')
+            return obj
         }
 
         //delete AM objects

@@ -1,10 +1,10 @@
-function AMImage(file_name,x, y, width, height, artwork) {
-    AMObject.call(this, x, y, width, height)
+function AMImage() {
+    AMObject.call(this)
 
     //set defaults
     this.type = 'AMImage'
     this.label = 'Image'
-    this.isArtwork = artwork || false
+    this.values.isArtwork = false
 
     var props = {
         file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
@@ -39,16 +39,14 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.createElement = function() {
         this.el = document.createElement('div')
-        this.el.classList.add('artwork')
         this.el.style.textAlign = 'center'
-
-        if ( this.isArtwork ) {
-            console.log('adding artwork' )
-            this.type = 'AMArtwork'
+        if ( this.values.isArtwork ) {
             this.label = 'Artwork'
+            this.el.classList.add('artwork')
             this.props.file_name = { label: 'file_name', type: 'dropdown', default: 'snap', values: [ 'fanart', 'flyer', 'marquee', 'snap', 'video', 'wheel' ] }
             this.values.file_name = this.props.file_name.default
-            console.dir(this.props)
+        } else {
+            this.el.classList.add('image')
         }
     }
 
@@ -57,11 +55,11 @@ function AMImage(file_name,x, y, width, height, artwork) {
         this.el.style.top = this.values.y + 'px'
         this.el.style.width = ( this.values.width ) ? this.values.width + 'px' : 'auto'
         this.el.style.height = ( this.values.height  ) ? this.values.height + 'px' : 'auto'
-        this.el.style.display = ( this.values.visible ) ? 'block' : 'none'
+        this.el.style.display = ( this.values.visible && !this.hidden ) ? 'block' : 'none'
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        if ( this.isArtwork ) {
+        if ( this.values.isArtwork ) {
             var currentDisplay = data.displays[data.displayIndex]
             var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
             var video = this.el.querySelector('video')
@@ -112,7 +110,7 @@ function AMImage(file_name,x, y, width, height, artwork) {
 
     this.toSquirrel = function() {
         var code = ''
-            if ( this.isArtwork ) {
+            if ( this.values.isArtwork ) {
                 code += 'local [object] = fe.add_artwork( [props].file_name, -1, -1, 1, 1)' + '\n'
             } else {
                 code += 'local [object] = fe.add_image( "resources/" + [props].file_name, -1, -1, 1, 1)' + '\n'

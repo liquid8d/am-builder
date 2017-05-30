@@ -1,4 +1,4 @@
-function AMObject(x, y, width, height) {
+function AMObject() {
     this.id = 0
     this.label = ''
     this.locked = false
