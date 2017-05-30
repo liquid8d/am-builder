@@ -1,13 +1,12 @@
-function AMImage() {
+function AMArtwork() {
     AMObject.call(this)
 
     //set defaults
-    this.type = 'AMImage'
-    this.label = 'Image'
-    this.values.isArtwork = false
+    this.type = 'AMArtwork'
+    this.label = 'Artwork'
 
     var props = {
-        file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
+        file_name: { label: 'file_name', type: 'dropdown', default: 'snap', values: [ 'fanart', 'flyer', 'marquee', 'snap', 'video', 'wheel' ] },
         red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
         green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
         blue: { label: 'blue', type: 'range', default: 255, min: 0, max: 255 },
@@ -31,7 +30,7 @@ function AMImage() {
         trigger: { label: 'trigger', type: 'text', default: '' },
         shader: { label: 'shader', type: 'text', default: '' }
     }
-
+    
     Object.keys(props).forEach(function(key) {
         this.props[key] = props[key]
         this.values[key] = props[key].default
@@ -40,7 +39,7 @@ function AMImage() {
     this.createElement = function() {
         this.el = document.createElement('div')
         this.el.style.textAlign = 'center'
-        this.el.classList.add('image')
+        this.el.classList.add('artwork')
     }
 
     this.updateElement = function() {
@@ -52,8 +51,33 @@ function AMImage() {
         this.el.style.transform = ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
         
-        var file = layout.findFile(this.values.file_name, 'name')
-        this.el.style.backgroundImage = ( file ) ? 'url(\'' + file.data + '\')' : ''
+        var currentDisplay = data.displays[data.displayIndex]
+        var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
+        var video = this.el.querySelector('video')
+        if ( video ) this.el.removeChild(video)
+        //if video_playing is enabled or if the ImagesOnly flag is set
+        if ( this.values.video_playing && !props.video_flags.values[0].checked.includes(this.values.video_flags) ) {
+            //add a video element for artwork video
+            var video = document.createElement('video')
+                video.src = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
+                video.setAttribute('type', 'video/mp4')
+                video.style.pointerEvents = 'none'
+                video.style.width = '100%'
+                video.style.height = '100%'
+                video.style.objectFit = ( this.values.preserve_aspect_ratio ) ? 'contain' : 'fill'
+                //if not noloop
+                if ( !props.video_flags.values[1].checked.includes(this.values.video_flags) ) video.setAttribute('loop', true)
+                //if not noautostart
+                if ( !props.video_flags.values[2].checked.includes(this.values.video_flags) ) video.setAttribute('autoplay', true)
+                //if noaudio
+                if ( props.video_flags.values[3].checked.includes(this.values.video_flags) ) video.setAttribute('muted', true)
+            this.el.style.backgroundImage = ''
+            this.el.appendChild(video)
+        } else {
+            //artwork images
+            this.el.style.backgroundImage = 'url(\'data/media/' + currentDisplay.name + '/' + this.values.file_name + '/' + currentRom.Name + '.png\')'
+        }
+        
         this.el.style.backgroundRepeat = 'no-repeat'
         this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : '0 0'
         this.el.style.backgroundSize = ( this.values.preserve_aspect_ratio ) ? 'contain' : '100% 100%'
@@ -72,7 +96,7 @@ function AMImage() {
 
     this.toSquirrel = function() {
         var code = ''
-            code += 'local [object] = fe.add_image( "resources/" + [props].file_name, -1, -1, 1, 1)' + '\n'
+            code += 'local [object] = fe.add_artwork( [props].file_name, -1, -1, 1, 1)' + '\n'
             Object.keys(this.props).forEach(function(key) {
                 switch(key) {
                     case 'video_playing':
@@ -97,5 +121,5 @@ function AMImage() {
     }
 }
 
-AMImage.prototype = Object.create(AMObject.prototype)
-AMImage.prototype.constructor = AMImage
+AMArtwork.prototype = Object.create(AMImage.prototype)
+AMArtwork.prototype.constructor = AMArtwork

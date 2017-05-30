@@ -13,9 +13,7 @@
             layout.addAMObject( new AMImage() )
         }
         addArtwork() {
-            var art = new AMImage()
-            art.values.isArtwork = true
-            layout.addAMObject(art)
+            layout.addAMObject( new AMArtwork() )
         }
         addListBox() {
             layout.addAMObject( new AMListBox() )
