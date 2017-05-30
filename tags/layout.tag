@@ -302,7 +302,7 @@
             zip.file('layout.nut', this.generateCode())
             var resources = zip.folder('resources')
             this.config.files.forEach(function(file) {
-                resources.file( ( file.type == 'font' ) ? file.label : file.name, file.data.replace('data:;base64,', '').replace('data:image/png;base64,', ''), { base64: true } )
+                resources.file( ( file.type == 'media' || file.type == 'font' || file.type == 'shader' ) ? file.label : file.name, file.data.replace('data:;base64,', '').replace('data:image/png;base64,', ''), { base64: true } )
             })
             zip.generateAsync({ type: 'blob' }).then(function(content) {
                 showModal('<p>Your download has started. Enjoy!</p><button onclick="closeModal()">Close</button>')
