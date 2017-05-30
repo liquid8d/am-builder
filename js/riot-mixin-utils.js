@@ -18,7 +18,7 @@ riot.mixin('utils', {
         if ( !svg ) return
         //r 0 0 0 0 0 g 0 0 0 0 0 b 0 0 0 0 0 1 0
         var color = r + ' 0 0 0 0 0 ' + g + ' 0 0 0 0 0 ' + b + ' 0 0 0 0 0' + ' 1 0'
-        var filter = svg.querySelector('filter') || document.createElementNS('http://www.w3.org/2000/svg', 'filter')
+        var filter = svg.getElementById(id) || document.createElementNS('http://www.w3.org/2000/svg', 'filter')
             filter.id = id
             filter.setAttribute( 'color-interpolation-filters', 'sRGB')
             filter.setAttribute( 'x', 0 )
