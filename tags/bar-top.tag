@@ -10,7 +10,7 @@
     <div if="{layout}" class="dropdown">
         <input type="text" value="{ layout.config.editor.zoom }%" onchange="{ setZoom }" />
         <select id="zoom" onchange="{ setZoom }">
-            <option each="{ val in zoomLevels }" value="{val}" selected="{ layout.config.editor.zoom == val }">{val}%</option>
+            <option each="{ val in layout.config.editor.zoomLevels }" value="{val}" selected="{ layout.config.editor.zoom == val }">{val}%</option>
         </select>
     </div>
     <span>Show Grid</span>
@@ -18,11 +18,11 @@
     <span>Snap to Grid</span>
     <input if="{layout}" type="checkbox" checked onchange="{layout.toggleSnap}" />
     <script>
-        this.zoomLevels = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 ]
         this.defaultZoom = 100
         this.layout = null
         setLayout(layout) {
             this.layout = layout
+            this.layout.on( 'editor-update', function () { this.update() }.bind(this) )
             this.update()
         }
         updateAspect(e) {

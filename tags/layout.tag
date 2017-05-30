@@ -1,14 +1,9 @@
 <layout>
     <!--
-        triggers:
-            object-added
-            object-selected
-            object-deselected
-            object-deleted
-            object-update
-            file-added
-            file-deleted
-            file-update
+        event triggers: ( these are generic events for now to notify listeners of a change )
+        Objects: object-added, object-selected, object-deselected
+        Files: file-added, file-deleted, file-update
+        Editor: editor-update
     -->
     <style>
         :scope {
@@ -52,6 +47,7 @@
         this.config = {
             editor: {
                 zoom: 100,
+                zoomLevels: [ 10, 25, 33, 50, 66.7, 100, 200 ],
                 gridlines: true,
                 snap: true,
                 snapSize: 10
@@ -300,61 +296,6 @@
             this.trigger('object-deselected')
         }
 
-        this.on('mount', function() {
-            this.root.onmousedown = function(e) {
-                this.select(e.target)
-            }.bind(this)
-            
-            interact('.object')
-                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
-                .draggable({
-                    restrict: {
-                        endOnly: true,
-                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-                    },
-                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
-                })
-                .on('dragmove', function(e) {
-                    if ( !this.selectedObject || this.selectedObject.locked ) return
-                        var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                        var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
-                            y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
-                            this.selectedObject.el.style.left = x + 'px'
-                            this.selectedObject.el.style.top = y + 'px'
-                        this.trigger('object-update')
-                }.bind(this))
-                .resizable({
-                    preserveAspectRatio: false,
-                    edges: { left: true, right: true, bottom: true, top: true },
-                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
-                })
-                .on('resizemove', function(event) {
-                    if ( !this.selectedObject || this.selectedObject.locked ) return
-                    var target = event.target,
-                        x = (parseFloat(target.getAttribute('data-x')) || 0),
-                        y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-                    // update the element's style
-                    target.style.width  = event.rect.width + 'px';
-                    target.style.height = event.rect.height + 'px';
-
-                    // translate when resizing from top or left edges
-                    x += event.deltaRect.left;
-                    y += event.deltaRect.top;
-                    
-                    var left = event.target.offsetLeft + x
-                    var top = event.target.offsetTop + y
-                    target.style.left = left + 'px'
-                    target.style.top = top + 'px'
-                    
-                    this.selectedObject.values.x = left
-                    this.selectedObject.values.y = top
-                    this.selectedObject.values.width = event.rect.width
-                    this.selectedObject.values.height = event.rect.height
-                    this.trigger('object-update')
-                }.bind(this))
-        })
-
         //create a zipfile of the layout contents, and prompt the user to save it
         createZip() {
             var zip = new JSZip()
@@ -470,6 +411,7 @@
             //this.root.style.zoom = scale
             this.root.querySelector('.layout').style.zoom = per + '%'
             this.config.editor.zoom = per
+            this.trigger('editor-update')
         }
 
         deleteSelected() {
@@ -489,11 +431,92 @@
         }
 
         this.on('mount', function() {
+            //handle click, drag and resize
+            interact('.object')
+                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
+                .draggable({
+                    restrict: {
+                        endOnly: true,
+                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                    },
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
+                })
+                .on('dragmove', function(e) {
+                    if ( !this.selectedObject || this.selectedObject.locked ) return
+                        var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                        var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
+                            y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
+                            this.selectedObject.el.style.left = x + 'px'
+                            this.selectedObject.el.style.top = y + 'px'
+                        this.trigger('object-update')
+                }.bind(this))
+                .resizable({
+                    preserveAspectRatio: false,
+                    edges: { left: true, right: true, bottom: true, top: true },
+                    snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
+                })
+                .on('resizemove', function(event) {
+                    if ( !this.selectedObject || this.selectedObject.locked ) return
+                    var target = event.target,
+                        x = (parseFloat(target.getAttribute('data-x')) || 0),
+                        y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+                    // update the element's style
+                    target.style.width  = event.rect.width + 'px';
+                    target.style.height = event.rect.height + 'px';
+
+                    // translate when resizing from top or left edges
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
+                    
+                    var left = event.target.offsetLeft + x
+                    var top = event.target.offsetTop + y
+                    target.style.left = left + 'px'
+                    target.style.top = top + 'px'
+                    
+                    this.selectedObject.values.x = left
+                    this.selectedObject.values.y = top
+                    this.selectedObject.values.width = event.rect.width
+                    this.selectedObject.values.height = event.rect.height
+                    this.trigger('object-update')
+                }.bind(this))
+
+            //select object on left mouse click
+            this.root.querySelector('.layout').onmousedown = function(e) {
+                if ( e.button == 0 ) this.select(e.target)
+            }.bind(this)
+            
+            //notify editor of layer mouse movement
             this.root.querySelector('.layout').onmousemove = function(e) {
                 var scale = ( this.config.editor.zoom / 100 )
                 var x = e.layerX / scale,
                     y = e.layerY / scale
                 barBottom.setMessage(1, 'x: ' + x + ' y: ' + y )
+            }.bind(this)
+            this.root.querySelector('.layout').onmouseleave = function(e) {
+                barBottom.setMessage(1, '' )
+            }
+            
+            //do zoom in/out with mouse wheel
+            this.root.onmousewheel = function(e) {
+                if ( e.deltaY < 0 ) {
+                    //zoom in
+                    for ( var i = 0; i < this.config.editor.zoomLevels.length; i++ ) {
+                        if ( this.config.editor.zoomLevels[i] > this.config.editor.zoom ) {
+                            this.config.editor.zoom = this.config.editor.zoomLevels[i]
+                            break
+                        }
+                    }
+                } else if ( e.deltaY > 0 ) {
+                    //zoom out
+                    for ( var i = this.config.editor.zoomLevels.length; i > 0; i-- ) {
+                        if ( this.config.editor.zoomLevels[i] < this.config.editor.zoom ) {
+                            this.config.editor.zoom = this.config.editor.zoomLevels[i]
+                            break
+                        }
+                    }
+                }
+                this.setZoom(this.config.editor.zoom)
             }.bind(this)
         })
     </script>
