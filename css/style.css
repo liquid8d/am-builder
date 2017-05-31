@@ -61,7 +61,8 @@ html, body {
 .menus {
     display: flex;
     flex-direction: column;
-    flex-basis: 192px;
+    min-width: 192px;
+    max-width: 192px;
 }
 menu {
     display: flex;
