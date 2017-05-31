@@ -122,7 +122,7 @@ menu button { width: 100%; }
 .icon.artwork { background-position: -32px 0px; }
 .icon.listbox { background-position: -48px 0px; }
 .icon.surface { background-position: -64px 0px; }
-.icon.clone { background-position: 80px 0px; }
+.icon.clone { background-position: -80px 0px; }
 .icon.lock { background-position: 0px -16px; }
 .icon.unlock { background-position: -16px -16px; }
 .icon.show { background-position: -32px -16px; }
