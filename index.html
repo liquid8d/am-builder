@@ -25,7 +25,6 @@
         <script src="tags/bar-bottom.tag" type="riot/tag"></script>
         <script src="tags/resizer.tag" type="riot/tag"></script>
         <!-- Design components -->
-        <script src="tags/menu-tools.tag" type="riot/tag"></script>
         <script src="tags/menu-layout.tag" type="riot/tag"></script>
         <script src="tags/menu-props.tag" type="riot/tag"></script>
         <script src="tags/menu-objects.tag" type="riot/tag"></script>
@@ -85,9 +84,8 @@
                 designMenu.setMenu({
                     accordian: false,
                     items: [
-                        { label: 'Tools', content: '<menu-tools></menu-tools>' },
-                        { label: 'Objects', expand: true, foldable: true, maxHeight: '160px', content: '<menu-objects></menu-objects>' },
-                        { label: 'Properties', expand: false, foldable: true, maxHeight: '240px', content: '<menu-props></menu-props>' },
+                        { label: 'Objects', minHeight: '160px', maxHeight: '160px', content: '<menu-objects></menu-objects>' },
+                        { label: 'Properties', expand: true, foldable: true, maxHeight: '240px', content: '<menu-props></menu-props>' },
                         { label: 'Navigate', foldable: true, content: '<menu-nav></menu-nav>' },
                         { label: 'Layout', foldable: true, maxHeight: '160px', content: '<menu-layout></menu-layout>' },
                         { label: 'Triggers', foldable: true, content: '<menu-triggers></menu-triggers>' },
@@ -95,7 +93,6 @@
                 })
 
                 //mount design menu components
-                menuTools = riot.mount('menu-tools')[0]
                 menuLayout = riot.mount('menu-layout')[0]
                 menuProps = riot.mount('menu-props')[0]
                 menuObjects = riot.mount('menu-objects')[0]

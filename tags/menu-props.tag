@@ -1,7 +1,6 @@
 <menu-props>
     <style scoped>
-        :scope { display: flex; }
-        .list { width: 100%; }
+        .list { width: 100%; padding: 5px; }
         input[type="number"] { width: 50px; }
         .item > input[type="text"] { width: 100px; }
         .multiselect {
@@ -49,7 +48,7 @@
             </div>
         </div>
     </div>
-    <div if="{ !showProps() }">
+    <div if="{ !showProps() }" style="padding: 5px;">
         <span>Click an object in the layout or in the objects list to view its properties</span>
     </div>
     <script>

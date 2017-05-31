@@ -1,29 +1,48 @@
 <menu-objects>
     <style scoped>
-        .list .item { cursor: pointer; }
+        :scope {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .list { overflow: auto; padding: 5px; flex-grow: 1; }
+        .list .item { cursor: pointer; flex-shrink: 0; }
         input[type="text"] {
             border: none;
             background: #111;
             color: #aaa;
             padding: 2px;
+            outline: none;
         }
         input[readonly] {
             background: transparent;
         }
     </style>
+    <!-- top toolbar -->
+    <div class="horizontal-toolbar" style="height: 20px; flex-shrink: 0;">
+        <span></span>
+    </div>
+    <!-- objects list -->
     <div if="{ showObjects() }" class="list">
         <div each="{ item in layout.config.objects }" class="item" data-id="{ item.id }" onclick="{ selectObject }">
             <div class="icon { ( item.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
             <div class="icon { ( item.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
-            <input type="text" style="flex-grow: 1;" data-id="{item.id}" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
-            <!--
-            <span style="flex-grow: 1; pointer-events: none;">{ item.label }</span>
-            -->
+            <input type="text" style="width: 100%;" data-id="{item.id}" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
             <div class="icon trash" onclick="{ deleteObject }"></div>
         </div>
     </div>
-    <div if="{ !showObjects() }">
+    <!-- empty list -->
+    <div if="{ !showObjects() }" style="padding: 10px; flex-grow: 1;">
         <span>No objects in layout</span>
+    </div>
+    <!-- bottom toolbar -->
+    <div class="horizontal-toolbar" style="height: 32px; flex-shrink: 0;">
+        <div class="no-select icon text" title="Text" onclick="{addText}"></div>
+        <div class="no-select icon image" title="Image" onclick="{addImage}"></div>
+        <div class="no-select icon artwork" title="Artwork" onclick="{addArtwork}"></div>
+        <div class="no-select icon listbox" title="Listbox" onclick="{addListBox}"></div>
+        <div class="no-select icon surface" title="Surface" onclick=""></div>
+        <div class="no-select icon clone" title="Clone" onclick=""></div>
     </div>
     <script>
         this.layout = null  //currently attached layout
@@ -56,6 +75,26 @@
                 this.editLabelEl.setAttribute('readonly', 'readonly')
                 this.editLabelEl = null
             }
+        }
+
+        addText() {
+            layout.addAMObject( new AMText() )
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+        }
+
+        addImage() {
+            layout.addAMObject( new AMImage() )
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+        }
+
+        addArtwork() {
+            layout.addAMObject( new AMArtwork() )
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+        }
+
+        addListBox() {
+            layout.addAMObject( new AMListBox() )
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
         }
 
         //whether to show the objects list

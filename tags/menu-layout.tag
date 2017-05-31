@@ -1,4 +1,7 @@
 <menu-layout>
+    <style scoped>
+        .list { padding: 5px; }
+    </style>
     <div if="{ show() }" class="list">
         <div class="item" each="{ prop, key in layout.config.globals }">
             <label style="flex-grow:1;">{prop.label}</label>
