@@ -21,7 +21,9 @@
             background: linear-gradient(rgb(5,5,5),rgb(15,15,15),rgb(5,5,5));
         }
         .gridlines {
+            position: absolute;
             background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo2Y2IyOTE4NC0wMjU3LTRhNDYtYWQzNS03YjY0N2MyZmM4OWUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzE1MDFEQTc0NDBEMTFFN0ExRTQ4QzZDRTM0RjEwRTMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzE1MDFEQTY0NDBEMTFFN0ExRTQ4QzZDRTM0RjEwRTMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MDMyNTQ4ZTktZTNkZi00ZjQwLWI0OTEtN2MzNjA1YmE4ZmUxIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjZjYjI5MTg0LTAyNTctNGE0Ni1hZDM1LTdiNjQ3YzJmYzg5ZSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PoE/vRoAAAAMUExURSEtSCAgIA8PDwAAAOlHyb4AAABgSURBVHja7NUhDgAhDEXBttz/zig0NAHUVK0hI15+Nsa6OvzK9osICASyR6p72X6hCQRi8ZpAIBavCQRi8cJDIJeQfH+aQCD+8ZpAIBavCQRi8cJDIBYvPATSRn7cFGAAf4RrcmCdlfgAAAAASUVORK5CYII=') repeat;
+            width: 100%;
             height: 100%;
             pointer-events: none;
         }
@@ -351,6 +353,8 @@
                             .replace('"Align.Left"', 'Align.Left')
                             .replace('"Align.Centre"', 'Align.Centre')
                             .replace('"Align.Left"', 'Align.Right')
+                            .replace('"Transition.ToNewSelection"', 'Transition.ToNewSelection')
+                            .replace('"Transition.EndNavigation"', 'Transition.EndNavigation')
                         code += ( objCount < this.config.objects.length ) ? ',\n' : '\n'
                     }
                 }.bind(this))
@@ -442,12 +446,14 @@
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('dragmove', function(e) {
+                    console.log('drag move')
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                        var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                        var x = this.selectedObject.values.x = this.selectedObject.el.offsetLeft + e.dx,
-                            y = this.selectedObject.values.y =  this.selectedObject.el.offsetTop + e.dy
-                            this.selectedObject.el.style.left = x + 'px'
-                            this.selectedObject.el.style.top = y + 'px'
+                            var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || parseFloat( this.selectedObject.values.x ) )  + ( e.dx / scale ),
+                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || parseFloat( this.selectedObject.values.y ) ) + ( e.dy / scale )
+                            this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                            e.target.setAttribute('data-x', x)
+                            e.target.setAttribute('data-y', y)
                         this.trigger('object-update')
                 }.bind(this))
                 .resizable({
@@ -455,35 +461,51 @@
                     edges: { left: true, right: true, bottom: true, top: true },
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
-                .on('resizemove', function(event) {
+                .on('resizemove', function(e) {
+                    console.log('resize move')
                     if ( !this.selectedObject || this.selectedObject.locked ) return
-                    var target = event.target,
-                        x = (parseFloat(target.getAttribute('data-x')) || 0),
-                        y = (parseFloat(target.getAttribute('data-y')) || 0);
+                    var container = this.root.querySelector('.layout')
+                    var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                    var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat( this.selectedObject.values.x ) ),
+                        y = ( parseFloat(e.target.getAttribute('data-y')) || parseFloat( this.selectedObject.values.y ) );
 
                     // update the element's style
-                    target.style.width  = event.rect.width + 'px';
-                    target.style.height = event.rect.height + 'px';
+                    var width = e.rect.width
+                    var height = e.rect.height
+                    e.target.style.width  =  width + 'px'
+                    e.target.style.height = height + 'px'
 
+                    //for image sprites (subimg), we have to force an update for the new transform
+                    //hacky, but it works
+                    var sprite = e.target.querySelector('.sprite')
+                    if ( sprite ) {
+                        riot.mixin('utils').resizeSprite( sprite,
+                                        width,
+                                        height,
+                                        this.selectedObject.values.subimg_x,
+                                        this.selectedObject.values.subimg_y,
+                                        this.selectedObject.values.subimg_width,
+                                        this.selectedObject.values.subimg_height )
+                    } else {
+                        this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                        this.selectedObject.values.width = parseInt(width)
+                        this.selectedObject.values.height = parseInt(height)
+                    }
+                    
                     // translate when resizing from top or left edges
-                    x += event.deltaRect.left;
-                    y += event.deltaRect.top;
-                    
-                    var left = event.target.offsetLeft + x
-                    var top = event.target.offsetTop + y
-                    target.style.left = left + 'px'
-                    target.style.top = top + 'px'
-                    
-                    this.selectedObject.values.x = left
-                    this.selectedObject.values.y = top
-                    this.selectedObject.values.width = event.rect.width
-                    this.selectedObject.values.height = event.rect.height
+                    x += e.deltaRect.left
+                    y += e.deltaRect.top
+                    e.target.setAttribute('data-x', x)
+                    e.target.setAttribute('data-y', y)
+
                     this.trigger('object-update')
                 }.bind(this))
-
+            
             //select object on left mouse click
             this.root.querySelector('.layout').onmousedown = function(e) {
+                console.log('select')
                 if ( e.button == 0 ) this.select(e.target)
+                e.preventDefault()
             }.bind(this)
             
             //notify editor of layer mouse movement

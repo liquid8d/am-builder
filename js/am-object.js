@@ -18,4 +18,11 @@ function AMObject() {
     Object.keys(this.props).forEach(function(key) {
         this.values[key] = this.props[key].default
     }.bind(this))
+
+    //create the html element that will represent the object
+    this.createElement = function() {}
+    //update the html element properties based on the object property values
+    this.updateElement = function() {}
+    //generate squirrel code that will create the object and set its properties
+    this.toSquirrel = function() {}
 }

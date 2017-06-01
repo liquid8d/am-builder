@@ -31,6 +31,24 @@ riot.mixin('utils', {
             filter.appendChild(matrix)
         svg.appendChild(filter)
     },
+    resizeSprite: function( img, width, height, subimg_x, subimg_y, subimg_width, subimg_height ) {
+        //stretched sprites - scales spritesheet, then clips a specific sprite for subimg
+        var scaleW = width / subimg_width,
+            scaleH = height / subimg_height,
+            adjWidth = img.naturalWidth * scaleW,
+            adjHeight = img.naturalHeight * scaleH,
+            pos = {
+                x: subimg_x * scaleW,
+                y: subimg_y * scaleH,
+                width: subimg_width * scaleW,
+                height: subimg_height * scaleH,
+            }
+        img.style.width = adjWidth + 'px'
+        img.style.height = adjHeight + 'px'
+        img.style.clip = 'rect( ' + pos.y + 'px ' + ( pos.x + pos.width ) + 'px ' + ( pos.y + pos.height ) + 'px ' + pos.x + 'px )'
+        img.style.transform = 'translate( ' + -pos.x + 'px, ' + -pos.y + 'px )'
+        img.style.transformOrigin = '0 0'
+    },
     fetch: function(url, opts) {
         if (!url) return
         opts.url = url
