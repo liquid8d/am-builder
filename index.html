@@ -32,6 +32,8 @@
         <script src="tags/menu-triggers.tag" type="riot/tag"></script>
         <!-- File Manager components -->
         <script src="tags/menu-files.tag" type="riot/tag"></script>
+        <!-- Settings components -->
+        <script src="tags/menu-settings.tag" type="riot/tag"></script>
         <!-- Dev components -->
         <script src="tags/menu-data.tag" type="riot/tag"></script>
         <!-- Styles -->
@@ -118,10 +120,12 @@
                 settingsMenu.setMenu({
                     accordian: false,
                     items: [
-                        { label: 'Settings', content: 'Settings here' },
+                        { label: 'Settings', content: '<menu-settings></menu-settings>' },
                     ]
                 })
-                
+                //mount settings components
+                menuSettings = riot.mount('menu-settings')[0]
+
                 //setup dev menu
                 devMenu = riot.mount('#menu-dev')[0]
                 devMenu.setMenu({
