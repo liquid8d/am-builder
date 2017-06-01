@@ -522,7 +522,7 @@
             
             //do zoom in/out with mouse wheel
             this.root.onmousewheel = function(e) {
-                if ( e.deltaY < 0 ) {
+                if ( e.ctrlKey && e.deltaY < 0 ) {
                     //zoom in
                     for ( var i = 0; i < this.config.editor.zoomLevels.length; i++ ) {
                         if ( this.config.editor.zoomLevels[i] > this.config.editor.zoom ) {
@@ -530,7 +530,7 @@
                             break
                         }
                     }
-                } else if ( e.deltaY > 0 ) {
+                } else if ( e.ctrlKey && e.deltaY > 0 ) {
                     //zoom out
                     for ( var i = this.config.editor.zoomLevels.length; i > 0; i-- ) {
                         if ( this.config.editor.zoomLevels[i] < this.config.editor.zoom ) {
