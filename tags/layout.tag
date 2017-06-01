@@ -470,10 +470,17 @@
                         y = ( parseFloat(e.target.getAttribute('data-y')) || parseFloat( this.selectedObject.values.y ) );
 
                     // update the element's style
-                    var width = e.rect.width
-                    var height = e.rect.height
+                    var width = parseInt(e.rect.width),
+                        height = parseInt(e.rect.height)
+                    
                     e.target.style.width  =  width + 'px'
                     e.target.style.height = height + 'px'
+                    this.selectedObject.values.width = width
+                    this.selectedObject.values.height = height
+
+                    // translate when resizing from top or left edges
+                    x += e.deltaRect.left
+                    y += e.deltaRect.top
 
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
@@ -488,16 +495,10 @@
                                         this.selectedObject.values.subimg_height )
                     } else {
                         this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
-                        this.selectedObject.values.width = parseInt(width)
-                        this.selectedObject.values.height = parseInt(height)
                     }
-                    
-                    // translate when resizing from top or left edges
-                    x += e.deltaRect.left
-                    y += e.deltaRect.top
+
                     e.target.setAttribute('data-x', x)
                     e.target.setAttribute('data-y', y)
-
                     this.trigger('object-update')
                 }.bind(this))
             
@@ -511,8 +512,8 @@
             //notify editor of layer mouse movement
             this.root.querySelector('.layout').onmousemove = function(e) {
                 var scale = ( this.config.editor.zoom / 100 )
-                var x = e.layerX / scale,
-                    y = e.layerY / scale
+                var x = parseInt(e.layerX / scale),
+                    y = parseInt(e.layerY / scale)
                 barBottom.setMessage(1, 'x: ' + x + ' y: ' + y )
             }.bind(this)
             this.root.querySelector('.layout').onmouseleave = function(e) {
