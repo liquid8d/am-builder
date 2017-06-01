@@ -35,20 +35,20 @@ html, body {
 .workspace .horizontal-toolbar {
     display: flex;
     flex-shrink: 0;
-    flex-grow: 1;
+    flex-grow: 0;
     flex-wrap: wrap;
-    overflow: auto;
+    overflow-y: auto;
     align-items: center;
     background: rgb(40,40,40);
     color: rgb(180, 180, 180);
-    height: 32px;
-    max-height: 64px;
+    height: 36px;
     width: 100%;
-    padding: 5px;
+    margin: 0;
+    padding: 3px;
 }
 .workspace .horizontal-toolbar.center { border-top: 1px solid rgb(30,30,30); border-bottom: 1px solid rgb(30,30,30); }
 .workspace .horizontal-toolbar.top { border-bottom: 1px solid rgb(30,30,30); }
-.workspace .horizontal-toolbar.bottom { border-top: 1px solid rgb(30,30,30); }
+.workspace .horizontal-toolbar.bottom { height: 42px; border-top: 1px solid rgb(30,30,30); }
 
 .workspace .vertical-toolbar {
     display: flex;
