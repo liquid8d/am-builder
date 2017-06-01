@@ -34,11 +34,15 @@ html, body {
 
 .workspace .horizontal-toolbar {
     display: flex;
-    flex-direction: row;
+    flex-shrink: 0;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    overflow: auto;
     align-items: center;
     background: rgb(40,40,40);
     color: rgb(180, 180, 180);
     height: 32px;
+    max-height: 64px;
     width: 100%;
     padding: 5px;
 }
@@ -179,6 +183,7 @@ button {
     border: none;
     padding: 5px;
     margin: 5px;
+    flex-shrink: 0;
 }
 button:hover {
     background: #5544aa;

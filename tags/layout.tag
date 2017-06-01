@@ -49,7 +49,7 @@
         this.config = {
             editor: {
                 zoom: 100,
-                zoomLevels: [ 10, 25, 33, 50, 66.7, 100, 200 ],
+                zoomLevels: [ 10, 25, 33, 50, 66.7, 100, 200, 300, 400 ],
                 gridlines: true,
                 snap: true,
                 snapSize: 10
