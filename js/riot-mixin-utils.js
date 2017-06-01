@@ -9,6 +9,37 @@ riot.mixin('utils', {
             val = JSON.parse( localStorage.getItem(id) )
         return val
     },
+    toggleFullscreen: function(el, forced) {
+        //launch specified element in fullscreen, default to document.body
+        forced = forced || false
+        var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+            (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+            (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+            (document.msFullscreenElement && document.msFullscreenElement !== null);
+
+        if (!isInFullScreen || forced) {
+            el = ( el ) ? el : document.body
+            if (el.requestFullscreen) {
+                el.requestFullscreen();
+            } else if (el.mozRequestFullScreen) {
+                el.mozRequestFullScreen();
+            } else if (el.webkitRequestFullScreen) {
+                el.webkitRequestFullScreen();
+            } else if (el.msRequestFullscreen) {
+                el.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    },
     //this allows you to colorize images with rgb values by adding filter: url(#idFromHere) to the image
     createFilterColor: function( id, r, g, b) {
         var svg = document.getElementById('color-filter') || document.createElementNS('http://www.w3.org/2000/svg', 'svg')
