@@ -437,6 +437,15 @@
             //handle click, drag and resize
             interact('.object')
                 .allowFrom('.selected')
+                .rectChecker(function(el) {
+                    var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
+                    return {
+                        top: el.getBoundingClientRect().top * scale,
+                        right: el.getBoundingClientRect().right * scale,
+                        bottom: el.getBoundingClientRect().bottom * scale,
+                        left: el.getBoundingClientRect().left * scale
+                    }
+                }.bind(this))
                 .draggable({
                     restrict: {
                         endOnly: true,
@@ -446,48 +455,46 @@
                 })
                 .on('dragmove', function(e) {
                     if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
-                            var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || parseFloat(this.selectedObject.values.x) )  + ( e.dx / scale ),
-                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || parseFloat(this.selectedObject.values.y) ) + ( e.dy / scale )
+                            var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
+                                x = this.selectedObject.values.x = parseFloat( this.selectedObject.values.x ) + ( e.dx / scale ),
+                                y = this.selectedObject.values.y = parseFloat( this.selectedObject.values.y ) + ( e.dy / scale )
                             this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
-                            e.target.setAttribute('data-x', x)
-                            e.target.setAttribute('data-y', y)
                         this.trigger('object-update')
                 }.bind(this))
                 .resizable({
                     preserveAspectRatio: false,
                     edges: { left: true, right: true, bottom: true, top: true },
-                    margin: 3,
+                    margin: 5,
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('resizemove', function(e) {
                     if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
-                    var container = this.root.querySelector('.layout')
-                    var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                    var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat(this.selectedObject.values.x) ),
-                        y = ( parseFloat(e.target.getAttribute('data-y')) || parseFloat(this.selectedObject.values.y) );
 
-                    // update the element's style
-                    var width = parseInt(e.rect.width),
-                        height = parseInt(e.rect.height)
-                    e.target.style.width  =  width + 'px'
-                    e.target.style.height = height + 'px'
-                    this.selectedObject.values.width = width
-                    this.selectedObject.values.height = height
-                    
-                    this.selectedObject.values.x = x
-                    this.selectedObject.values.y = y
-                    
+                    var container = this.root.querySelector('.layout'),
+                        scale = ( this.config.editor.zoom / 100 ).toFixed(2),
+                        x = parseFloat(this.selectedObject.values.x),
+                        y = parseFloat(this.selectedObject.values.y),
+                        width = parseInt(e.rect.width / scale),
+                        height = parseInt(e.rect.height / scale)
+
                     // translate when resizing from top or left edges
                     x += e.deltaRect.left
                     y += e.deltaRect.top
-                    
+
+                    this.selectedObject.values.x = x
+                    this.selectedObject.values.y = y
+                    this.selectedObject.values.width = width
+                    this.selectedObject.values.height = height
+
+                    // update the element's style
+                    e.target.style.width  =  width + 'px'
+                    e.target.style.height = height + 'px'
+                    this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
                     var sprite = e.target.querySelector('.sprite')
                     if ( sprite ) {
-                        x -= e.deltaRect.left
-                        y -= e.deltaRect.top
                         this.selectedObject.resizeSprite( sprite,
                                         width,
                                         height,
@@ -495,12 +502,7 @@
                                         this.selectedObject.values.subimg_y,
                                         this.selectedObject.values.subimg_width,
                                         this.selectedObject.values.subimg_height )
-                    } else {
-                        this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
                     }
-
-                    e.target.setAttribute('data-x', x)
-                    e.target.setAttribute('data-y', y)
                     this.trigger('object-update')
                 }.bind(this))
             
