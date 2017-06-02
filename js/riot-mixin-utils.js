@@ -40,46 +40,6 @@ riot.mixin('utils', {
             }
         }
     },
-    //this allows you to colorize images with rgb values by adding filter: url(#idFromHere) to the image
-    createFilterColor: function( id, r, g, b) {
-        var svg = document.getElementById('color-filter') || document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-        svg.id = 'color-filter'
-        svg.classList.add('defs-only')
-        document.body.appendChild(svg)
-        if ( !svg ) return
-        //r 0 0 0 0 0 g 0 0 0 0 0 b 0 0 0 0 0 1 0
-        var color = r + ' 0 0 0 0 0 ' + g + ' 0 0 0 0 0 ' + b + ' 0 0 0 0 0' + ' 1 0'
-        var filter = svg.getElementById(id) || document.createElementNS('http://www.w3.org/2000/svg', 'filter')
-            filter.id = id
-            filter.setAttribute( 'color-interpolation-filters', 'sRGB')
-            filter.setAttribute( 'x', 0 )
-            filter.setAttribute( 'y', 0 )
-            filter.setAttribute( 'width', '100%' )
-            filter.setAttribute( 'height', '100%' )
-            var matrix = filter.querySelector('feColorMatrix') || document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix')
-            matrix.setAttribute( 'type', 'matrix' )
-            matrix.setAttribute( 'values', color )
-            filter.appendChild(matrix)
-        svg.appendChild(filter)
-    },
-    resizeSprite: function( img, width, height, subimg_x, subimg_y, subimg_width, subimg_height ) {
-        //stretched sprites - scales spritesheet, then clips a specific sprite for subimg
-        var scaleW = width / subimg_width,
-            scaleH = height / subimg_height,
-            adjWidth = img.naturalWidth * scaleW,
-            adjHeight = img.naturalHeight * scaleH,
-            pos = {
-                x: subimg_x * scaleW,
-                y: subimg_y * scaleH,
-                width: subimg_width * scaleW,
-                height: subimg_height * scaleH,
-            }
-        img.style.width = adjWidth + 'px'
-        img.style.height = adjHeight + 'px'
-        img.style.clip = 'rect( ' + pos.y + 'px ' + ( pos.x + pos.width ) + 'px ' + ( pos.y + pos.height ) + 'px ' + pos.x + 'px )'
-        img.style.transform = 'translate( ' + -pos.x + 'px, ' + -pos.y + 'px )'
-        img.style.transformOrigin = '0 0'
-    },
     fetch: function(url, opts) {
         if (!url) return
         opts.url = url
@@ -138,51 +98,5 @@ riot.mixin('utils', {
         link.rel = "stylesheet";
         link.href = url;
         document.getElementsByTagName("head")[0].appendChild(link);
-    },
-    //replace magic tokens
-    magicTokens: function( text, index_offset ) {
-        if ( index_offset == undefined ) index_offset = 0
-        if ( !data ) return text
-        var currentDisplay = data.displays[data.displayIndex]
-        var currentFilter = currentDisplay.filters[data.filterIndex]
-        var currentRom = currentDisplay.romlist[ utils.getAdjustedIndex(index_offset) ]
-        //var currentStats = ( currentRom ) ? currentDisplay.stats[currentRom.Name] : { "PlayedTime": 0, "PlayedCount": 0 }
-        var currentStats = { "PlayedTime": 5423, "PlayedCount": 27 }
-        return text.replace('[DisplayName]', currentDisplay.name)
-                    .replace('[ListSize]', currentDisplay.romlist.length )
-                    .replace('[ListEntry]', data.listIndex )
-                    .replace('[FilterName]', currentFilter.name )
-                    .replace('[Search]', currentDisplay.Search )
-                    .replace('[SortName]', currentDisplay.SortName )
-                    .replace('[Name]', currentRom.Name )
-                    .replace('[Title]', currentRom.Title)
-                    .replace('[Emulator]', currentRom.Emulator )
-                    .replace('[CloneOf]', currentRom.CloneOf )
-                    .replace('[Year]', currentRom.Year )
-                    .replace('[Manufacturer]', currentRom.Manufacturer )
-                    .replace('[Category]', currentRom.Category )
-                    .replace('[Players]', currentRom.Players )
-                    .replace('[Rotation]', currentRom.Rotation )
-                    .replace('[Control]', currentRom.Control )
-                    .replace('[Status]', currentRom.Status )
-                    .replace('[DisplayCount]', currentRom.DisplayCount )
-                    .replace('[DisplayType]', currentRom.DisplayType )
-                    .replace('[AltRomname]', currentRom.AltRomname )
-                    .replace('[AltTitle]', currentRom.AltTitle )
-                    .replace('[PlayedTime]', currentStats.PlayedTime )
-                    .replace('[PlayedCount]', currentStats.PlayedCount )
-                    .replace('[SortValue]', currentDisplay.SortValue )
-                    .replace('[System]', data.emulators[currentRom.Emulator].System )
-                    .replace('[SystemN]', data.emulators[currentRom.Emulator].System )
-                    .replace('[Overview]', "" )
-    },
-    getAdjustedIndex: function(index_offset) {
-        //not working, need to loop or not loop?
-        var current_index = data.listIndex + index_offset
-        var currentDisplay = data.displays[data.displayIndex]
-        var max = currentDisplay.romlist.length - 1
-        if ( current_index < 0 ) current_index = Math.abs( Math.floor( max / current_index ) ) - 1
-        if ( current_index > max ) current_index = Math.abs( Math.floor( current_index / max ) ) - 1
-        return current_index
     }
 })

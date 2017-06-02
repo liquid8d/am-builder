@@ -76,7 +76,7 @@
         this.aspects = [ 'Standard (4x3)', 'Standard Vert (3x4)', 'Wide (16x10)', 'Wide Vert (10x16)', 'HD (16x9)', 'HD Vert (9x16)' ]
         this.values = {}
         this.selectedObject = null
-        this.idCounter = 1
+        this.idCounter = 0
         this.idCounterFiles = this.config.files.length
 
         //update globals values for this layout
@@ -151,8 +151,7 @@
                 var saveObj = {
                     id: obj.id,
                     label: obj.label,
-                    locked: obj.locked,
-                    hidden: obj.hidden,
+                    editor: obj.editor,
                     type: obj.type,
                     aspect_values: obj.aspect_values,
                     values: obj.values
@@ -167,6 +166,7 @@
             this.root.querySelector('.layout').querySelectorAll('.object').forEach(function(el) {
                 this.deleteObject(this.findObjectByEl(el))
             }.bind(this))
+            this.idCounter = this.config.objects.length
             this.update()
             this.trigger('object-deleted')
         }
@@ -179,7 +179,7 @@
             //recreate objects from standard JS object
             var objects = riot.mixin('utils').load('objects')
             objects.forEach(function(obj) {
-                var newObj = new window[obj.type]()
+                var newObj = getInstance(obj.type)
                 Object.keys(obj).forEach(function(key) {
                     newObj[key] = obj[key]
                 })
@@ -363,10 +363,22 @@
             code += '}\n\n'
             //write out object code
             this.config.objects.forEach(function(obj) {
-                var objId = obj.type + obj.id
-                var objCode = utils.replaceAll(obj.toSquirrel(), '[object]', objId )
-                objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
-                code += objCode + '\n'
+                //create primary objects first
+                if ( !obj.editor.clone ) {
+                    var objId = obj.type + obj.id
+                    var objCode = utils.replaceAll( obj.toSquirrel(), '[object]', objId )
+                    objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
+                    code += objCode + '\n'
+                }
+            }.bind(this))
+            this.config.objects.forEach(function(obj) {
+                //create clones after primary objects
+                if ( obj.editor.clone ) {
+                    var objId = obj.type + obj.id
+                    var objCode = utils.replaceAll(obj.clonetoSquirrel(), '[object]', objId )
+                    objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
+                    code += objCode + '\n'
+                }
             }.bind(this))
             return code
         }
@@ -446,8 +458,7 @@
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('dragmove', function(e) {
-                    console.log('drag move')
-                    if ( !this.selectedObject || this.selectedObject.locked ) return
+                    if ( !this.selectedObject || this.selectedObject.editor.locked ) return
                             var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                             var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || parseFloat( this.selectedObject.values.x ) )  + ( e.dx / scale ),
                                 y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || parseFloat( this.selectedObject.values.y ) ) + ( e.dy / scale )
@@ -462,8 +473,7 @@
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('resizemove', function(e) {
-                    console.log('resize move')
-                    if ( !this.selectedObject || this.selectedObject.locked ) return
+                    if ( !this.selectedObject || this.selectedObject.editor.locked ) return
                     var container = this.root.querySelector('.layout')
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                     var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat( this.selectedObject.values.x ) ),
@@ -486,7 +496,7 @@
                     //hacky, but it works
                     var sprite = e.target.querySelector('.sprite')
                     if ( sprite ) {
-                        riot.mixin('utils').resizeSprite( sprite,
+                        this.selectedObject.resizeSprite( sprite,
                                         width,
                                         height,
                                         this.selectedObject.values.subimg_x,

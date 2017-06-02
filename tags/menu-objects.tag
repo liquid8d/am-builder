@@ -25,8 +25,8 @@
     <!-- objects list -->
     <div if="{ showObjects() }" class="list">
         <div each="{ item in layout.config.objects }" class="item" data-id="{ item.id }" onclick="{ selectObject }">
-            <div class="icon { ( item.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
-            <div class="icon { ( item.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
+            <div class="icon { ( item.editor.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
+            <div class="icon { ( item.editor.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
             <input type="text" style="width: 100%;" data-id="{item.id}" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
             <div class="icon trash" onclick="{ deleteObject }"></div>
         </div>
@@ -41,8 +41,8 @@
         <div class="no-select icon image" title="Image" onclick="{addImage}"></div>
         <div class="no-select icon artwork" title="Artwork" onclick="{addArtwork}"></div>
         <div class="no-select icon listbox" title="Listbox" onclick="{addListBox}"></div>
+        <div class="no-select icon clone" title="Clone" onclick="{addClone}"></div>
         <div class="no-select icon surface" title="Surface" onclick=""></div>
-        <div class="no-select icon clone" title="Clone" onclick=""></div>
     </div>
     <script>
         this.layout = null  //currently attached layout
@@ -79,22 +79,35 @@
 
         addText() {
             layout.addAMObject( new AMText() )
-            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
         addImage() {
             layout.addAMObject( new AMImage() )
-            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
         addArtwork() {
             layout.addAMObject( new AMArtwork() )
-            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
         addListBox() {
             layout.addAMObject( new AMListBox() )
-            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight;
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
+        }
+
+        addClone() {
+            if ( !layout.selectedObject || ( ( layout.selectedObject instanceof AMImage ) == false && layout.selectedObject instanceof AMArtwork == false ) ) return
+            var cloned = getInstance(layout.selectedObject.type)
+            cloned.editor.clone = layout.selectedObject.type + layout.selectedObject.id
+            console.log('cloning: ' + cloned.editor.clone)
+            //clone parent properties
+            Object.keys(layout.selectedObject.values).forEach(function(key) {
+                cloned.values[key] = layout.selectedObject.values[key]
+            })
+            layout.addAMObject( cloned )
+            this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
         //whether to show the objects list
@@ -137,10 +150,10 @@
         //toggle the clicked objects visibility in the layout
         toggleVisible(e) {
             var clickedObject = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
-            if ( clickedObject ) clickedObject.hidden = !clickedObject.hidden
+            if ( clickedObject ) clickedObject.editor.hidden = !clickedObject.editor.hidden
             clickedObject.updateElement()
             this.layout.trigger('object-update')
-            if ( clickedObject.hidden ) {
+            if ( clickedObject.editor.hidden ) {
                 e.target.classList.remove('hide')
                 e.target.classList.add('show')
             } else {
@@ -152,8 +165,8 @@
         //toggle the object lock in the layout (prevents moving/resizing)
         toggleLock(e) {
             var clickedObject = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
-            if ( clickedObject ) clickedObject.locked = !clickedObject.locked
-            if ( clickedObject.locked ) {
+            if ( clickedObject ) clickedObject.editor.locked = !clickedObject.editor.locked
+            if ( clickedObject.editor.locked ) {
                 e.target.classList.remove('unlock')
                 e.target.classList.add('lock')
             } else {
