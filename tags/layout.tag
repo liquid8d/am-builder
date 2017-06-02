@@ -283,7 +283,6 @@
             this.selectedObject = this.findObjectByEl(el)
             if ( this.selectedObject ) {
                 this.selectedObject.el.classList.add('selected')
-                this.selectedObject.el.onmousedown = this.startDrag
                 this.trigger('object-selected')
             }
         }
@@ -432,18 +431,6 @@
 
         deleteSelected() {
             this.deleteObject(this.selectedObject)
-        }
-
-        startDrag(e) {
-            if ( !this.selectedObject.locked ) {
-                //console.log('start drag ' + this.dragType)
-                this.root.onmouseup = function(e) {
-                    //stop drag
-                    this.isDragging = false
-                }.bind(this)
-                this.isDragging = true
-                e.stopPropagation()
-            }
         }
 
         this.on('mount', function() {
