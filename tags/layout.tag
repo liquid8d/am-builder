@@ -458,7 +458,7 @@
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('dragmove', function(e) {
-                    if ( !this.selectedObject || this.selectedObject.editor.locked ) return
+                    if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
                             var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                             var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || 0 )  + ( e.dx / scale ),
                                 y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || 0 ) + ( e.dy / scale )
@@ -470,10 +470,11 @@
                 .resizable({
                     preserveAspectRatio: false,
                     edges: { left: true, right: true, bottom: true, top: true },
+                    margin: 3,
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
                 .on('resizemove', function(e) {
-                    if ( !this.selectedObject || this.selectedObject.editor.locked ) return
+                    if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
                     var container = this.root.querySelector('.layout')
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                     var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat( this.selectedObject.values.x ) ),
@@ -514,9 +515,10 @@
             
             //select object on left mouse click
             this.root.querySelector('.layout').onmousedown = function(e) {
-                console.log('select')
-                if ( e.button == 0 ) this.select(e.target)
-                e.preventDefault()
+                if ( e.button == 0 ) {
+                    this.select(e.target)
+                    e.preventDefault()
+                }
             }.bind(this)
             
             //notify editor of layer mouse movement
