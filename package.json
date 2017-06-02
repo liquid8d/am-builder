@@ -1,6 +1,7 @@
 {
-    "name": "AMBuild",
+    "name": "AMBuilder",
     "author": "",
+    "version": "1.0",
     "scripts": {
         "start": "electron ."
     }
