@@ -436,7 +436,7 @@
         this.on('mount', function() {
             //handle click, drag and resize
             interact('.object')
-                .on('tap', function(e) { this.select(e.target); e.preventDefault() }.bind(this))
+                .allowFrom('.selected')
                 .draggable({
                     restrict: {
                         endOnly: true,
@@ -447,8 +447,8 @@
                 .on('dragmove', function(e) {
                     if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
                             var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || 0 )  + ( e.dx / scale ),
-                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || 0 ) + ( e.dy / scale )
+                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || parseFloat(this.selectedObject.values.x) )  + ( e.dx / scale ),
+                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || parseFloat(this.selectedObject.values.y) ) + ( e.dy / scale )
                             this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
                             e.target.setAttribute('data-x', x)
                             e.target.setAttribute('data-y', y)
@@ -464,22 +464,30 @@
                     if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
                     var container = this.root.querySelector('.layout')
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                    var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat( this.selectedObject.values.x ) ),
-                        y = ( parseFloat(e.target.getAttribute('data-y')) || parseFloat( this.selectedObject.values.y ) );
+                    var x = ( parseFloat(e.target.getAttribute('data-x')) || parseFloat(this.selectedObject.values.x) ),
+                        y = ( parseFloat(e.target.getAttribute('data-y')) || parseFloat(this.selectedObject.values.y) );
 
                     // update the element's style
                     var width = parseInt(e.rect.width),
                         height = parseInt(e.rect.height)
-                    
                     e.target.style.width  =  width + 'px'
                     e.target.style.height = height + 'px'
                     this.selectedObject.values.width = width
                     this.selectedObject.values.height = height
-
+                    
+                    this.selectedObject.values.x = x
+                    this.selectedObject.values.y = y
+                    
+                    // translate when resizing from top or left edges
+                    x += e.deltaRect.left
+                    y += e.deltaRect.top
+                    
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
                     var sprite = e.target.querySelector('.sprite')
                     if ( sprite ) {
+                        x -= e.deltaRect.left
+                        y -= e.deltaRect.top
                         this.selectedObject.resizeSprite( sprite,
                                         width,
                                         height,
@@ -490,10 +498,6 @@
                     } else {
                         this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
                     }
-
-                    // translate when resizing from top or left edges
-                    x += e.deltaRect.left
-                    y += e.deltaRect.top
 
                     e.target.setAttribute('data-x', x)
                     e.target.setAttribute('data-y', y)
@@ -507,7 +511,7 @@
                     e.preventDefault()
                 }
             }.bind(this)
-            
+
             //notify editor of layer mouse movement
             this.root.querySelector('.layout').onmousemove = function(e) {
                 var scale = ( this.config.editor.zoom / 100 )
