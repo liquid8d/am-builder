@@ -460,8 +460,8 @@
                 .on('dragmove', function(e) {
                     if ( !this.selectedObject || this.selectedObject.editor.locked ) return
                             var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
-                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || parseFloat( this.selectedObject.values.x ) )  + ( e.dx / scale ),
-                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || parseFloat( this.selectedObject.values.y ) ) + ( e.dy / scale )
+                            var x = this.selectedObject.values.x = ( parseFloat(e.target.getAttribute('data-x') ) || 0 )  + ( e.dx / scale ),
+                                y = this.selectedObject.values.y = ( parseFloat(e.target.getAttribute('data-y') ) || 0 ) + ( e.dy / scale )
                             this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
                             e.target.setAttribute('data-x', x)
                             e.target.setAttribute('data-y', y)
@@ -488,10 +488,6 @@
                     this.selectedObject.values.width = width
                     this.selectedObject.values.height = height
 
-                    // translate when resizing from top or left edges
-                    x += e.deltaRect.left
-                    y += e.deltaRect.top
-
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
                     var sprite = e.target.querySelector('.sprite')
@@ -506,6 +502,10 @@
                     } else {
                         this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
                     }
+
+                    // translate when resizing from top or left edges
+                    x += e.deltaRect.left
+                    y += e.deltaRect.top
 
                     e.target.setAttribute('data-x', x)
                     e.target.setAttribute('data-y', y)
@@ -532,7 +532,7 @@
             
             //do zoom in/out with mouse wheel
             this.root.onmousewheel = function(e) {
-                if ( e.ctrlKey && e.deltaY < 0 ) {
+                if ( e.shiftKey && e.deltaY < 0 ) {
                     //zoom in
                     for ( var i = 0; i < this.config.editor.zoomLevels.length; i++ ) {
                         if ( this.config.editor.zoomLevels[i] > this.config.editor.zoom ) {
@@ -540,7 +540,7 @@
                             break
                         }
                     }
-                } else if ( e.ctrlKey && e.deltaY > 0 ) {
+                } else if ( e.shiftKey && e.deltaY > 0 ) {
                     //zoom out
                     for ( var i = this.config.editor.zoomLevels.length; i > 0; i-- ) {
                         if ( this.config.editor.zoomLevels[i] < this.config.editor.zoom ) {
