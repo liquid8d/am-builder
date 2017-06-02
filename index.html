@@ -122,6 +122,7 @@
                     accordian: false,
                     items: [
                         { label: 'Settings', content: '<menu-settings></menu-settings>' },
+                        { label: 'Tools', content: '<ul><li><a onclick="showExternal(\'http://www.spritecow.com/\')">Sprite Cow</a><p>Sprite Cow can be useful to show locations of sprites in a spriteheet you already have that is used with subimg.</p></li><li><a onclick="showExternal(\'http://www.retinaspritegenerator.com/\')">Retina Sprite Generator</a><p>Retina Spritesheet Generator can create a spritesheet from multiple images. You can download the resulting image and use the sprite locations it provides with subimg.</p></li><li><i>Note: CSS uses negative x/y positions in spritesheets, for AttractMode you will use positive</i></li></ul></div>'}
                     ]
                 })
                 //mount settings components
@@ -134,11 +135,13 @@
                     items: [
                         { 
                             label: 'Dev tools',
-                            content: '<button onclick="console.dir(layout)">Output Layout</button>' +
+                            content: '<div style="display: flex; flex-direction: column; padding: 5px;">' +
+                            '<button onclick="console.dir(layout)">Output Layout</button>' +
                             '<button onclick="console.table(data.displays)">Output Displays</button>' +
                             '<button onclick="console.table(data.displays[data.displayIndex].romlist)">Output Current Romlist</button>' +
                             '<button onclick="console.table(layout.config.files)">Output Files</button>' +
-                            '<button onclick="console.dir(layout.selectedObject)">Output SelectedObject</button>'
+                            '<button onclick="console.dir(layout.selectedObject)">Output SelectedObject</button>' +
+                            '</div>'
                         },
                         {
                             label: 'Data',
@@ -202,6 +205,10 @@
             function showModal(html) {
                 document.querySelector('.modal').style.display = 'block'
                 document.querySelector('.modal .content').innerHTML = html
+            }
+
+            function showExternal(url) {
+                showModal('<iframe src="' + url + '" style="width: 100%; height: 100%; border: none;" height="100%"></iframe><button onclick="closeModal()">Close</button>')
             }
 
             function closeModal() {
