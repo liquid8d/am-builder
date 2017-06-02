@@ -1,5 +1,6 @@
 <menu-files>
     <style scoped>
+        .container { padding: 5px; }
         .list .item { cursor: pointer; }
         .list .item span { flex-grow: 1; overflow: hidden; pointer-events: none; }
         .preview { border: 1px solid rgb(25,25,25); width: 100%; height: 64px; background-size: cover; margin: 7px 0 7px 0; }
@@ -7,14 +8,16 @@
         .dropzone.over { border: 1px dashed #999933 }
         input[type='file'] { margin-top: 7px; }
     </style>
-    <div class="dropzone" dragenter="{onDragEnter}" dragleave="{onDragLeave}" dragover="{onDragOver}" ondrop="{onDrop}">
-        <p style="margin: 0; pointer-events: none;">{ opts.drop_msg }</p>
-    </div>
-    <div class="preview" class="preview"></div>
-    <div if="{ show() }" class="list">
-        <div each="{ item in fileList() }" class="item" data-id="{ item.id }" onclick="{ preview }">
-            <span>{ item.label }</span>
-            <div class="icon trash" onclick="{ remove }"></div>
+    <div class="container">
+        <div class="dropzone" dragenter="{onDragEnter}" dragleave="{onDragLeave}" dragover="{onDragOver}" ondrop="{onDrop}">
+            <p style="margin: 0; pointer-events: none;">{ opts.drop_msg }</p>
+        </div>
+        <div class="preview" class="preview"></div>
+        <div if="{ show() }" class="list">
+            <div each="{ item in fileList() }" class="item" data-id="{ item.id }" onclick="{ preview }">
+                <span>{ item.label }</span>
+                <div class="icon trash" onclick="{ remove }"></div>
+            </div>
         </div>
     </div>
     <script>

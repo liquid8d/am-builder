@@ -177,13 +177,17 @@ menu button { width: 100%; }
 }
 
 /* misc */
+ul { list-style: none; margin: 0; padding: 5px; }
+li { padding: 5px; }
+a { color: #aaa; cursor: pointer; text-decoration: underline; }
+
 button {
     background: #444499;
     color: #efefef;
     border: none;
     padding: 5px;
     margin: 5px;
-    flex-shrink: 0;
+    flex-grow: 0;
 }
 button:hover {
     background: #5544aa;
