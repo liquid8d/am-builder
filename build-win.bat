@@ -1,0 +1,1 @@
+electron-packager . AMBuilder --platform=win32 --electron-version 1.6.2 --out=release

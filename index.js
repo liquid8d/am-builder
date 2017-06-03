@@ -3,7 +3,7 @@ const {app, BrowserWindow} = require('electron')
 app.on('ready', function() {
     let win = new BrowserWindow({
         width: 1024,
-        height: 480,
+        height: 768,
         webPreferences: {
             plugins: true
         }
@@ -12,7 +12,7 @@ app.on('ready', function() {
     win.loadURL('file://' + __dirname + '/index.html')
     
     //for debugging
-    win.openDevTools()
+    //win.openDevTools()
 })
 
 //Application IPC callbacks
