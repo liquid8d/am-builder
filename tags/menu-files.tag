@@ -78,11 +78,13 @@
                         reader.onload = (function(theFile) {
                             return function(e) {
                                 //process
-                                console.log( 'processed: ' + theFile.name )
+                                console.dir(theFile)
+                                console.log( 'processed: ' + theFile.name + ' of type ' + theFile.type )
                                 layout.addFile({
-                                    label: theFile.name,
-                                    name: theFile.name.replace('.TTF', '').replace('.OTF', '').replace('.ttf', '').replace('.otf', ''),
+                                    label: theFile.name.replace('.TTF', '').replace('.OTF', '').replace('.ttf', '').replace('.otf', ''),
+                                    name: theFile.name,
                                     type: fileType,
+                                    mime: theFile.type || '',
                                     data: e.target.result,
                                 })
                             }
@@ -110,7 +112,7 @@
                             break
                         case 'font':
                             preview.innerHTML = 'Example'
-                            preview.style.fontFamily = clicked.name
+                            preview.style.fontFamily = clicked.label
                             preview.style.fontSize = '16px'
                             break
                         default:
@@ -141,12 +143,12 @@
                 if ( f.type == this.opts.file_type ) {
                     switch( f.type ) {
                         case 'font':
-                            var style = document.getElementById('font-' + f.name)
+                            var style = document.getElementById('font-' + f.label)
                             if ( !style ) {
-                                console.log('adding font: ' + f.name)
+                                console.log('adding font: ' + f.label)
                                 style = document.createElement('style')
-                                style.id = 'font-' + f.name
-                                style.innerHTML = '@font-face { font-family: \'' + f.name + '\'; src: local(\'☺\'), url(\'' + f.data + '\') format("opentype"); }'
+                                style.id = 'font-' + f.label
+                                style.innerHTML = '@font-face { font-family: \'' + f.label + '\'; src: local(\'☺\'), url(\'' + f.data + '\') format("opentype"); }'
                                 document.head.appendChild(style)
                             }
                             break

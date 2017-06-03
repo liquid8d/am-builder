@@ -1,7 +1,7 @@
 <bar-bottom>
     <button onclick="riot.mixin('utils').toggleFullscreen()">Fullscreen</button>
     <button onclick="{showCode}">View Code</button>
-    <button if="{layout}" onclick="{layout.createZip}">Download ZIP</button>
+    <button if="{layout}" onclick="{layout.saveZip}">Download ZIP</button>
     <button if="{layout}" onclick="{layout.clear}">Clear</button>
     <button if="{layout}" onclick="{layout.save}">Save</button>
     <button if="{layout}" onclick="{layout.resume}">Resume</button>

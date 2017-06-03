@@ -24,12 +24,14 @@
             </div>
             <!-- select property -->
             <select if="{ prop.type=='select' }" onchange="{ updateProps }">
+                <option></option>
                 <option if="{ typeof prop.values != 'string' }" each="{ val in prop.values }" selected="{ layout.selectedObject.values[key] == val }">{val}</option>
             </select>
             <!-- dropdown property -->
             <div if="{ prop.type=='dropdown' }" class="dropdown">
                 <input type="text" value="{ layout.selectedObject.values[key] }" onchange="{ updateProps }" />
                 <select if="{layout}" onchange="{ updateProps }">
+                    <option></option>
                     <option if="{ typeof prop.values === 'string' && prop.values == '[media]' }" each="{ media in layout.config.media }" value="{media.name}">{media.name}</option>
                     <option if="{ typeof prop.values != 'string' }" each="{ val in prop.values }" selected="{ layout.selectedObject.values[key] == val }">{val}</option>
                 </select>
@@ -39,7 +41,7 @@
                 <input type="text" value="{ layout.selectedObject.values[key] }" onchange="{ updateProps }" />
                 <select if="{layout}" onchange="{ updateProps }">
                     <option></option>
-                    <option each="{ file in layout.config.files }" if="{ file.type == prop.values }" value="{file.name}">{file.name}</option>
+                    <option each="{ file in layout.config.files }" if="{ file.type == prop.values }" value="{file.label}">{file.label}</option>
                 </select>
             </div>
             <!-- multiselect property -->
