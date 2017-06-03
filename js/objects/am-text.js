@@ -24,6 +24,8 @@ class AMText extends AMObject {
             shader: { label: 'shader', type: 'select', default: '', values: [] }
         }
         //set current value for all props to the defaults
+        this.values.width = 200
+        this.values.height = 20
         Object.keys(textProps).forEach(function(key) {
             this.props[key] = textProps[key]
             this.values[key] = textProps[key].default

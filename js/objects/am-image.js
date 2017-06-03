@@ -4,7 +4,7 @@ class AMImage extends AMObject {
         this.type = 'AMImage'
         this.label = 'Image'
         var imageProps = {
-            file_name: { label: 'file_name', type: 'file', default: 'missing.png', values: 'media' },
+            file_name: { label: 'file_name', type: 'file', default: 'pixel.png', values: 'media' },
             preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
             video_flags: { label: 'video_flags', type: 'multiselect', default: 0, values: [ { label: 'ImagesOnly', value: 1, checked: [1,3,5,7,9,11,13,15] }, { label: 'NoLoop', value: 2, checked: [2,3,6,7,10,11,14,15] }, { label: 'NoAutoStart', value: 4, checked: [4,5,6,7,12,13,14,15] }, { label: 'NoAudio', value: 8, checked: [8,9,10,11,12,13,14,15] }] },
             video_playing: { label: 'video_playing', type: 'bool', default: false },
