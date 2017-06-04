@@ -58,23 +58,6 @@ AMObject.prototype.toSquirrel = function() {
     //          obj.prop = val
 }
 
-AMObject.prototype.clonetoSquirrel = function() {
-    var parentId = this.editor.clone
-    var code = ''
-        code += 'local [object] = fe.add_clone(' + parentId + ')' + '\n'
-        code += '   foreach( key, val in props[aspect]["[object]"] )\n'
-        code += '      if ( key != "file_name" && key != "subimg_width" && key != "subimg_height" && key != "zorder" && key != "shader" )\n'
-        code += '         try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'
-        if ( this.values.zorder >= 0 )
-            code += '   [object].zorder = ' + this.values.zorder + '\n'
-        if ( this.values.subimg_width != 0 || this.values.subimg_height != 0 ) {
-            code += '   [object].subimg_width = ' + this.values.subimg_width + '\n'
-            code += '   [object].subimg_height = ' + this.values.subimg_height + '\n'
-        }
-        return code
-}
-
-
 //get adjust index for object data
 AMObject.prototype.getAdjustedIndex = function(index_offset) {
     //not working, need to loop or not loop?

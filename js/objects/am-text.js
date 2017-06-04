@@ -65,9 +65,9 @@ class AMText extends AMObject {
     }
 
     toSquirrel() {
+        //note: [surface] [object] and [props] are dynamically replaced as object variables respectively
         var code = ''
-            //note: '[object]' and '[props]' are dynamic and are replaced with the object values respectively
-            code += 'local [object] = fe.add_text( "' + this.values.msg + '", -1, -1, 1, 1 )' + '\n'
+            code += 'local [object] = [surface].add_text( "' + this.values.msg + '", -1, -1, 1, 1 )' + '\n'
             code += '   foreach( key, val in props[aspect]["[object]"] )\n'
             code += '      if ( key != "zorder" && key != "shader" )\n'
             code += '         try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'

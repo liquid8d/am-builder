@@ -1,10 +1,10 @@
 class AMClone extends AMImage {
-    constructor(parent) {
-        if ( !parent ) return null
+    constructor(clone) {
+        if ( !clone ) return null
         super()
         this.label = 'Clone'
-        this.type = parent.type
-        this.parent = parent
+        this.type = clone.type
+        this.editor.clone = clone
     }
 
     createElement() {
@@ -14,7 +14,6 @@ class AMClone extends AMImage {
         }.bind(this))
         super.createElement()
         this.el.classList.add('clone')
-        this.editor.clone = true
     }
 
     updateElement() {
@@ -22,9 +21,10 @@ class AMClone extends AMImage {
     }
 
     toSquirrel() {
-        var parentId = this.parent.type + this.parent.id
+        super.toSquirrel()
+        //note: [surface] [clone] [object] and [props] are dynamically replaced as object variables respectively
         var code = ''
-            code += 'local [object] = fe.add_clone(' + parentId + ')' + '\n'
+            code += 'local [object] = fe.add_clone([clone])' + '\n'
             code += '   foreach( key, val in props[aspect]["[object]"] )\n'
             code += '      if ( key != "file_name" && key != "subimg_width" && key != "subimg_height" && key != "zorder" && key != "shader" )\n'
             code += '         try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'

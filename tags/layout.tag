@@ -37,6 +37,10 @@
             background-size: contain;
         }
 
+        .surface {
+            border-style: inset;
+            border: 1px dashed gray;
+        }
         .selected {
             border-style: inset;
             border: 1px dashed yellow;
@@ -86,10 +90,12 @@
             this.values[key] = this.config.globals[key].default
         }.bind(this))
 
-        updateElements() {
-            this.config.objects.forEach(function(obj) {
+        updateElements(objects) {
+            if ( !objects ) objects = this.config.objects
+            objects.forEach(function(obj) {
                 obj.updateElement()
-            })
+                if ( obj.objects ) this.updateElements(obj.objects)
+            }.bind(this))
         }
 
         toggleSnap() {
@@ -146,8 +152,7 @@
         //add AM objects
         addAMObject(obj) {
             if ( !obj ) return
-            //console.log('adding object')
-            obj.id = this.idCounter
+            obj.id = obj.type + this.idCounter.toString()
             this.idCounter++
             obj.label = obj.label || obj.type
             this.config.objects.push( obj )
@@ -166,34 +171,44 @@
         }
 
         //delete AM objects
-        deleteObject(obj) {
+        deleteObject(obj, objects) {
             if ( !obj ) return
-            this.config.objects.forEach(function(o, idx) {
-                if ( o.id == obj.id ) {
-                obj.el.parentNode.removeChild(obj.el)
-                    this.config.objects.splice(idx, 1)
+            if ( !objects ) objects = this.config.objects
+            objects.slice().reverse().forEach(function( item, i, o) {
+                if ( item.id == obj.id ) {
+                    obj.el.parentNode.removeChild(obj.el)
+                    objects.splice(o.length - 1 - i, 1)
                     this.unselect()
                     this.trigger('object-deleted')
                 }
+                if ( objects[i] && objects[i].objects ) this.deleteObject( obj, objects[i].objects )
             }.bind(this))
         }
 
         //find object by its assigned id
-        findObjectById(id) {
-            var selected = null
-            this.config.objects.forEach(function(obj) {
-                if ( id == obj.id ) selected = obj
-            })
-            return selected
+        findObjectById(id, objects) {
+            if ( !objects ) objects = this.config.objects
+            for ( var i = 0; i < objects.length; i++) {
+                if ( id == objects[i].id ) return objects[i]
+                if ( objects[i].objects ) {
+                    var child = this.findObjectById(id, objects[i].objects)
+                    if ( child ) return child
+                }
+            }
+            return null
         }
 
         //find object by the element representing it
-        findObjectByEl(el) {
-            var selected = null
-            this.config.objects.forEach(function(obj) {
-                if ( el.getAttribute('data-id') == obj.id ) selected = obj
-            })
-            return selected
+        findObjectByEl(el, objects) {
+            if ( !objects ) objects = this.config.objects
+            for ( var i = 0; i < objects.length; i++) {
+                if ( objects[i].id == el.getAttribute('data-id') ) return objects[i]
+                if ( objects[i].objects ) {
+                    var child = this.findObjectByEl(el, objects[i].objects)
+                    if ( child ) return child
+                }
+            }
+            return null
         }
         
         //add new file
@@ -234,6 +249,7 @@
         //select an AM object element in the layout
         select(el) {
             this.unselect()
+            if ( !el ) return
             this.selectedObject = this.findObjectByEl(el)
             if ( this.selectedObject ) {
                 this.selectedObject.el.classList.add('selected')
@@ -242,10 +258,13 @@
         }
 
         //deselect an AM object element in the layout
-        unselect() {
-            if ( this.selectedObject ) {
-                this.selectedObject.el.classList.remove('selected')
-                this.selectedObject.el.onmousedown = function() {}
+        unselect(objects) {
+            if ( !this.selectedObject ) return
+            if ( !objects ) objects = this.config.objects
+            for ( var i = 0; i < objects.length; i++) {
+                if ( objects[i].el ) objects[i].el.classList.remove('selected')
+                if ( objects[i].objects )
+                    this.unselect(objects[i].objects)
             }
             this.selectedObject = null
             this.trigger('object-deselected')
@@ -266,19 +285,26 @@
             riot.mixin('utils').save('values', this.values)
             riot.mixin('utils').save('files', this.config.files)
             //convert objects to standard JS object
-            var objects = []
-            this.config.objects.forEach(function(obj) {
+            var objects = this.saveObjects()
+            riot.mixin('utils').save('objects', objects )
+        }
+
+        saveObjects(objects) {
+            if ( !objects ) objects = this.config.objects
+            var list = []
+            objects.forEach(function(obj) {
                 var saveObj = {
                     id: obj.id,
                     label: obj.label,
+                    objects: ( obj.objects ) ? this.saveObjects(obj.objects) : null,
                     editor: obj.editor,
                     type: obj.type,
                     aspect_values: obj.aspect_values,
                     values: obj.values
                 }
-                objects.push(saveObj)
-            })
-            riot.mixin('utils').save('objects', objects)
+                list.push(saveObj)
+            }.bind(this))
+            return list
         }
 
         //restore state of the layout
@@ -292,24 +318,35 @@
 
         //loads layout content from a JS object
         loadContent(content) {
-            try {
+            //try {
                 console.log('loading layout')
                 this.clear()
                 this.values = content.values
                 this.config.files = content.files || []
                 //recreate objects from standard JS object
-                var objects = content.objects
-                objects.forEach(function(obj) {
+                content.objects.forEach(function(obj) {
                     var newObj = getInstance(obj.type)
                     Object.keys(obj).forEach(function(key) {
-                        newObj[key] = obj[key]
+                        if ( key != 'objects' ) newObj[key] = obj[key]
                     })
                     this.addAMObject(newObj)
+                    if ( obj.objects ) {
+                        //add surface objects
+                        var surface = this.findObjectById(newObj.id)
+                        obj.objects.forEach(function(subobj) {
+                            var newChild = getInstance(subobj.type)
+                            Object.keys(subobj).forEach(function(key) {
+                                //if ( key != 'objects' ) newObj[key] = obj[key]
+                                newChild[key] = subobj[key]
+                            })
+                            surface.addObject(newChild)
+                        })
+                    }
                 }.bind(this))
                 this.trigger('object-added')
                 this.trigger('file-update')
                 this.updateElements()
-            } catch(e) { console.error('Error loading layout content: ' + e)}
+            //} catch(e) { console.error('Error loading layout content: ' + e)}
         }
 
         //load from zip file
@@ -405,50 +442,55 @@
             code += '\n'
             code += '//stored aspect values\n'
             code += 'local aspect = "Standard (4x3)"\n'
-            //write out properties for all aspects
-            code += 'local props = {\n'
-            var availableAspects = []
+            var aspects = []
+            if ( this.config.objects.length == 0 ) {
+                //inform user there are no objects in the layout
+                code += 'fe.add_text("There are no objects in this layout", 10, 10, fe.layout.width - 10, 20)'
+                return code
+            }
+            //create an object with all aspects in it
             Object.keys(this.config.objects[0].aspect_values).forEach(function(key) {
-                availableAspects.push(key)
+                aspects.push(key)
             })
-            availableAspects.forEach(function(aspect, idx) {
-                code += '   "' + aspect + '": {\n'
-                var objCount = 0
-                this.config.objects.forEach(function(obj) {
-                    if ( obj.aspect_values[aspect] ) {
-                        objCount++
-                        var objId = obj.type + obj.id
-                        //we have to convert constant strings to constants here
-                        code += '      "' + objId + '":' + JSON.stringify(obj.aspect_values[aspect])
-                            .replace('"Align.Left"', 'Align.Left')
-                            .replace('"Align.Centre"', 'Align.Centre')
-                            .replace('"Align.Left"', 'Align.Right')
-                            .replace('"Transition.ToNewSelection"', 'Transition.ToNewSelection')
-                            .replace('"Transition.EndNavigation"', 'Transition.EndNavigation')
-                        code += ( objCount < this.config.objects.length ) ? ',\n' : '\n'
-                    }
-                }.bind(this))
-                code += ( idx < availableAspects.length -1 ) ? '   },\n' : '   }\n'
-            }.bind(this))
-            code += '}\n\n'
-            //write out object code
-            this.config.objects.forEach(function(obj) {
-                //create primary objects first
-                if ( !obj.editor.clone ) {
-                    var objId = obj.type + obj.id
-                    var objCode = utils.replaceAll( obj.toSquirrel(), '[object]', objId )
-                    objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
-                    code += objCode + '\n'
+            //generate the object properties for all aspects and objects
+            code += 'local props = ' + this.generatePropsCode(aspects) + '\n\n'
+            code += this.generateObjectCode()
+            return code
+        }
+
+        //generate the aspect property table for all layout objects
+        generatePropsCode(aspects, obj, objects) {
+            var obj = {}
+            objects = objects || this.config.objects
+            for ( var a = 0; a < aspects.length; a++) {
+                obj[aspects[a]] = {}
+                for ( var i = 0; i < objects.length; i++) {
+                    obj[aspects[a]][objects[i].id] = ( objects[i].aspect_values[aspects[a]] ) ? objects[i].aspect_values[aspects[a]] : objects[i].values
+                    //should be recursive
+                    if ( objects[i].objects )
+                        for ( var x = 0; x < objects[i].objects.length; x++ )
+                            obj[aspects[a]][objects[i].objects[x].id] = ( objects[i].objects[x].aspect_values[aspects[a]] ) ? objects[i].objects[x].aspect_values[aspects[a]] : objects[i].objects[x].values
                 }
-            }.bind(this))
-            this.config.objects.forEach(function(obj) {
-                //create clones after primary objects
-                if ( obj.editor.clone ) {
-                    var objId = obj.type + obj.id
-                    var objCode = utils.replaceAll(obj.clonetoSquirrel(), '[object]', objId )
-                    objCode = utils.replaceAll(objCode, '[props]', 'props[aspect]["' + objId + '"]' )
-                    code += objCode + '\n'
-                }
+            }
+            var code = JSON.stringify(obj)
+                code = utils.replaceAll(code, '"Align.Left"', 'Align.Left')
+                code = utils.replaceAll(code, '"Align.Centre"', 'Align.Centre')
+                code = utils.replaceAll(code, '"Align.Left"', 'Align.Right')
+                code = utils.replaceAll(code, '"Transition.ToNewSelection"', 'Transition.ToNewSelection')
+                code = utils.replaceAll(code, '"Transition.EndNavigation"', 'Transition.EndNavigation')
+            return code
+        }
+
+        //generate code for objects
+        generateObjectCode(code, objects) {
+            var code = ''
+            if ( !objects ) objects = this.config.objects
+            objects.forEach(function(obj) {
+                code += utils.replaceAll( obj.toSquirrel(), '[surface]', ( obj.editor.surface ) ? obj.editor.surface : 'fe')
+                code = utils.replaceAll( code, '[clone]', obj.editor.clone )
+                code = utils.replaceAll( code, '[object]', obj.id )
+                code = utils.replaceAll( code, '[props]', 'props[aspect]["' + obj.id + '"]' )
+                if ( obj.objects ) this.generateObjectCode(code, obj.objects)
             }.bind(this))
             return code
         }
@@ -505,10 +547,11 @@
         }
 
         this.on('mount', function() {
-            
-            //handle click, drag and resize
             interact('.object')
-                .allowFrom('.selected')
+                //.allowFrom('.selected')
+                .on('tap', function(e) {
+                    this.select(e.target)
+                }.bind(this))
                 .rectChecker(function(el) {
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2)
                     return {
@@ -525,13 +568,18 @@
                     },
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
+                .on('dragstart', function(e) {
+                    this.select(e.target)
+                }.bind(this))
                 .on('dragmove', function(e) {
-                    if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
-                            var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
-                                x = this.selectedObject.values.x = parseFloat( this.selectedObject.values.x ) + ( e.dx / scale ),
-                                y = this.selectedObject.values.y = parseFloat( this.selectedObject.values.y ) + ( e.dy / scale )
-                            this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
-                        this.trigger('object-update')
+                    var dragObject = this.findObjectByEl(e.target, this.config.objects)
+                    if ( !dragObject || dragObject.editor.locked ) return
+                    dragObject.el.classList.add('selected')
+                    var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
+                        x = dragObject.values.x = parseFloat( dragObject.values.x ) + ( e.dx / scale ),
+                        y = dragObject.values.y = parseFloat( dragObject.values.y ) + ( e.dy / scale )
+                    dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    this.trigger('object-update')
                 }.bind(this))
                 .resizable({
                     preserveAspectRatio: false,
@@ -539,13 +587,17 @@
                     margin: 5,
                     snap: { targets: [ interact.createSnapGrid({ x: this.config.editor.snapSize, y: this.config.editor.snapSize }) ], range: Infinity }
                 })
+                .on('resizestart', function(e) {
+                    this.select(e.target)
+                }.bind(this))
                 .on('resizemove', function(e) {
-                    if ( !this.selectedObject || e.target != this.selectedObject.el || this.selectedObject.editor.locked ) return
-
-                    var container = this.root.querySelector('.layout'),
-                        scale = ( this.config.editor.zoom / 100 ).toFixed(2),
-                        x = parseFloat(this.selectedObject.values.x),
-                        y = parseFloat(this.selectedObject.values.y),
+                    var dragObject = this.findObjectByEl(e.target, this.config.objects)
+                    if ( !dragObject || dragObject.editor.locked ) return
+                    dragObject.el.classList.add('selected')
+                    
+                    var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
+                        x = parseFloat(dragObject.values.x),
+                        y = parseFloat(dragObject.values.y),
                         width = parseInt(e.rect.width / scale),
                         height = parseInt(e.rect.height / scale)
 
@@ -553,36 +605,36 @@
                     x += e.deltaRect.left
                     y += e.deltaRect.top
 
-                    this.selectedObject.values.x = x
-                    this.selectedObject.values.y = y
-                    this.selectedObject.values.width = width
-                    this.selectedObject.values.height = height
+                    dragObject.values.x = x
+                    dragObject.values.y = y
+                    dragObject.values.width = width
+                    dragObject.values.height = height
 
                     // update the element's style
-                    e.target.style.width  =  width + 'px'
-                    e.target.style.height = height + 'px'
-                    this.selectedObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    dragObject.el.style.width  =  width + 'px'
+                    dragObject.el.style.height = height + 'px'
+                    dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
 
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
-                    var sprite = e.target.querySelector('.sprite')
+                    var sprite = dragObject.el.querySelector('.sprite')
                     if ( sprite ) {
-                        this.selectedObject.resizeSprite( sprite,
+                        dragObject.resizeSprite( sprite,
                                         width,
                                         height,
-                                        this.selectedObject.values.subimg_x,
-                                        this.selectedObject.values.subimg_y,
-                                        this.selectedObject.values.subimg_width,
-                                        this.selectedObject.values.subimg_height )
+                                        dragObject.values.subimg_x,
+                                        dragObject.values.subimg_y,
+                                        dragObject.values.subimg_width,
+                                        dragObject.values.subimg_height )
                     }
                     this.trigger('object-update')
                 }.bind(this))
-            
+
             //select object on left mouse click
             this.root.querySelector('.layout').onmousedown = function(e) {
                 if ( e.button == 0 ) {
                     this.select(e.target)
-                    e.preventDefault()
+                    //e.preventDefault()
                 }
             }.bind(this)
 

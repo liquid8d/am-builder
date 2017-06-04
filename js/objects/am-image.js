@@ -8,7 +8,7 @@ class AMImage extends AMObject {
             preserve_aspect_ratio: { label: 'preserve_aspect_ratio', type: 'bool', default: false },
             video_flags: { label: 'video_flags', type: 'multiselect', default: 0, values: [ { label: 'ImagesOnly', value: 1, checked: [1,3,5,7,9,11,13,15] }, { label: 'NoLoop', value: 2, checked: [2,3,6,7,10,11,14,15] }, { label: 'NoAutoStart', value: 4, checked: [4,5,6,7,12,13,14,15] }, { label: 'NoAudio', value: 8, checked: [8,9,10,11,12,13,14,15] }] },
             video_playing: { label: 'video_playing', type: 'bool', default: false },
-            smooth: { label: 'smooth', type: 'bool', default: false },
+            smooth: { label: 'smooth', type: 'bool', default: true },
             trigger: { label: 'trigger', type: 'select', default: 'Transition.ToNewSelection', values: [ 'Transition.ToNewSelection', 'Transition.EndNavigation' ] },
             red: { label: 'red', type: 'range', default: 255, min: 0, max: 255 },
             green: { label: 'green', type: 'range', default: 255, min: 0, max: 255 },
@@ -39,6 +39,12 @@ class AMImage extends AMObject {
         this.el = document.createElement('div')
         this.el.textAlign = 'center'
         this.el.classList.add('image')
+        var img = document.createElement('img')
+            img.style.display = 'none'
+            img.style.pointerEvents = 'none'
+            img.style.position = 'absolute'
+            img.classList.add('sprite')
+        this.el.appendChild(img)
     }
 
     updateElement() {
@@ -59,9 +65,8 @@ class AMImage extends AMObject {
         this.el.style.height = this.values.height + 'px'
         this.el.style.background = ''
 
-        //we add child elements for video or subimg, these are added depending on the artwork type ( video or subimg )
+        //we added a child img element for subimg, this is shown/hidden depending on the image type ( standard or subimg )
         var img = this.el.querySelector('img')
-        if ( img ) this.el.removeChild(img)
 
         if ( this.type == "AMImage" ) {
             var file = layout.findFile(this.values.file_name, 'name')
@@ -69,14 +74,8 @@ class AMImage extends AMObject {
             if ( is_subimg ) {
                 //subimg
                 this.el.style.overflow = 'hidden'
-                if ( !img ) {
-                    img = document.createElement('img')
-                    img.style.pointerEvents = 'none'
-                    img.style.position = 'absolute'
-                    img.classList.add('sprite')
-                }
+                img.style.display = ''
                 img.src = ( file ) ? file.data : ''
-                this.el.appendChild(img)
                 this.resizeSprite(  img,
                                     this.values.width,
                                     this.values.height,
@@ -86,6 +85,7 @@ class AMImage extends AMObject {
                                     this.values.subimg_height )
             } else {
                 //standard image, use background instead for auto scaling
+                img.style.display = ''
                 this.el.style.overflow = ''
                 this.el.style.background = 'url(\'' + file.data + '\') no-repeat'
                 this.el.style.backgroundPosition = ( this.values.preserve_aspect_ratio ) ? 'center' : '0 0'
@@ -109,8 +109,13 @@ class AMImage extends AMObject {
     }
 
     toSquirrel() {
+        //note: [surface] [object] and [props] are dynamically replaced as object variables respectively
         var code = ''
-            code += 'local [object] = fe.add_image( "resources/" + [props].file_name, -1, -1, 1, 1)' + '\n'
+            if ( this.editor.clone ) {
+                code += 'local [object] = [surface].add_clone([clone])' + '\n'
+            } else {
+                code += 'local [object] = [surface].add_image( "resources/" + [props].file_name, -1, -1, 1, 1)' + '\n'
+            }
             code += '   foreach( key, val in props[aspect]["[object]"] )\n'
             code += '      if ( key != "file_name" && key != "subimg_width" && key != "subimg_height" && key != "zorder" && key != "shader" )\n'
             code += '         try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'

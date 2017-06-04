@@ -17,6 +17,14 @@
         input[readonly] {
             background: transparent;
         }
+        .item.clone input { color: rgb(100, 100, 175); }
+        .item.surface input { color: rgb(175, 100, 100); }
+        .item.surface { border-top: 1px solid #333; border-right: 1px solid #333; border-left: 1px solid #333; }
+        .item.surface.expanded { border-bottom: none; }
+        .item.surface.collapsed { border-bottom: 1px solid #333; }
+        .item .expandable.collapsed::before { margin: 0 5px 0 5px; content: "+"; }
+        .item .expandable.expanded::before { margin: 0 5px 0 5px; content: '-'; border-bottom: none; }
+        .children { border-right: 1px solid #333; border-bottom: 1px solid #333; border-left: 1px solid #333; }
     </style>
     <!-- top toolbar -->
     <div class="horizontal-toolbar" style="height: 20px; flex-shrink: 0;">
@@ -24,12 +32,23 @@
     </div>
     <!-- objects list -->
     <div if="{ showObjects() }" class="list">
-        <div each="{ item in layout.config.objects }" class="item" data-id="{ item.id }" onclick="{ selectObject }">
-            <div class="icon { ( item.editor.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
-            <div class="icon { ( item.editor.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
-            <input type="text" style="width: 100%;" data-id="{item.id}" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
-            <div class="icon trash" onclick="{ deleteObject }"></div>
-        </div>
+        <virtual each="{ item in layout.config.objects }">
+            <div class="item { ( item.type == 'AMSurface' ) ? 'surface' : '' } { ( item.editor.clone ) ? 'clone' : '' } { ( item.editor.expanded ) ? 'expanded' : 'collapsed' }" data-id="{ item.id }" onclick="{ selectObject }">
+                <div class="icon { ( item.editor.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
+                <div class="icon { ( item.editor.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
+                <div if="{ item.type == 'AMSurface' }" class="expandable { ( item.editor.expanded ) ? 'expanded' : 'collapsed' }" onclick="{ toggleChildren }"></div>
+                <input type="text" style="width: 100%;" data-id="{ item.id }" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
+                <div class="icon trash" onclick="{ deleteObject }"></div>
+            </div>
+            <div if="{ item.type == 'AMSurface' }" class="children {item.type + item.id}-children">
+                <div each="{ subitem in item.objects }" class="item { ( subitem.editor.clone ) ? 'clone' : '' }" data-id="{ subitem.id }" onclick="{ selectObject }">
+                    <div class="icon { ( subitem.editor.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
+                    <div class="icon { ( subitem.editor.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
+                    <input type="text" style="width: 100%;" value="{subitem.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
+                    <div class="icon trash" onclick="{ deleteObject }"></div>
+                </div>
+            </div>
+        </virtual>
     </div>
     <!-- empty list -->
     <div if="{ !showObjects() }" style="padding: 10px; flex-grow: 1;">
@@ -42,7 +61,7 @@
         <div class="no-select icon artwork" title="Artwork" onclick="{addArtwork}"></div>
         <div class="no-select icon listbox" title="Listbox" onclick="{addListBox}"></div>
         <div class="no-select icon clone" title="Clone" onclick="{addClone}"></div>
-        <div class="no-select icon surface" title="Surface" onclick=""></div>
+        <div class="no-select icon surface" title="Surface" onclick="{addSurface}"></div>
     </div>
     <script>
         this.layout = null  //currently attached layout
@@ -51,7 +70,6 @@
         editLabelStart(e) {
             this.editLabelEl = e.target
             this.editLabelEl.removeAttribute('readonly')
-            //this.editLabelEl.focus(function() { this.select() })
         }
 
         editLabelEnd(e) {
@@ -60,13 +78,13 @@
                 if ( e.type == 'keydown' && e.keyCode == 27 ) {
                     //cancel label edit on esc
                     var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
-                    this.editLabelEl.value = obj.label
+                    if ( obj ) this.editLabelEl.value = obj.label
                     end = true
                 }
                 if ( e.type == 'blur' || ( e.type == 'keydown' && e.keyCode == 13 ) ) {
                     //submit label edit
                     var obj = this.layout.findObjectById( this.editLabelEl.getAttribute('data-id') )
-                    obj.label = this.editLabelEl.value
+                    if ( obj ) obj.label = this.editLabelEl.value
                     end = true
                 }
             }
@@ -77,37 +95,129 @@
             }
         }
 
-        addText() {
-            layout.addAMObject( new AMText() )
+        addText(e) {
+            var selected = this.root.querySelector('.item.selected')
+            if ( selected ) {
+                var object = layout.findObjectById( selected.getAttribute('data-id') )
+                if ( object && selected.classList.value.indexOf('surface') >= 0 ) {
+                    //surface selected, add to it
+                    object.addObject( new AMText() )
+                } else if ( object && object.editor.surface ) {
+                    //object on surface selected, add to that surface
+                    var surface = layout.findObjectById( object.editor.surface )
+                    surface.addObject( new AMText() )
+                } else {
+                    //fallback
+                    layout.addAMObject( new AMText() )
+                }
+            } else {
+                layout.addAMObject( new AMText() )
+            }
             this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
-        addImage() {
-            layout.addAMObject( new AMImage() )
+        addImage(e) {
+            var selected = this.root.querySelector('.item.selected')
+            if ( selected ) {
+                var object = layout.findObjectById( selected.getAttribute('data-id') )
+                if ( object && selected.classList.value.indexOf('surface') >= 0 ) {
+                    //surface selected, add to it
+                    object.addObject( new AMImage() )
+                } else if ( object && object.editor.surface ) {
+                    //object on surface selected, add to that surface
+                    var surface = layout.findObjectById( object.editor.surface )
+                    surface.addObject( new AMImage() )
+                } else {
+                    //fallback
+                    layout.addAMObject( new AMImage() )
+                }
+            } else {
+                layout.addAMObject( new AMImage() )
+            }
             this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
-        addArtwork() {
-            layout.addAMObject( new AMArtwork() )
+        addArtwork(e) {
+            var selected = this.root.querySelector('.item.selected')
+            if ( selected ) {
+                var object = layout.findObjectById( selected.getAttribute('data-id') )
+                if ( object && selected.classList.value.indexOf('surface') >= 0 ) {
+                    //surface selected, add to it
+                    object.addObject( new AMArtwork() )
+                } else if ( object && object.editor.surface ) {
+                    //object on surface selected, add to that surface
+                    var surface = layout.findObjectById( object.editor.surface )
+                    surface.addObject( new AMArtwork() )
+                } else {
+                    //fallback
+                    layout.addAMObject( new AMArtwork() )
+                }
+            } else {
+                layout.addAMObject( new AMArtwork() )
+            }
             this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
-        addListBox() {
-            layout.addAMObject( new AMListBox() )
+        addListBox(e) {
+            var selected = this.root.querySelector('.item.selected')
+            if ( selected ) {
+                var object = layout.findObjectById( selected.getAttribute('data-id') )
+                if ( object && selected.classList.value.indexOf('surface') >= 0 ) {
+                    //surface selected, add to it
+                    object.addObject( new AMListBox() )
+                } else if ( object && object.editor.surface ) {
+                    //object on surface selected, add to that surface
+                    var surface = layout.findObjectById( object.editor.surface )
+                    surface.addObject( new AMListBox() )
+                } else {
+                    //fallback
+                    layout.addAMObject( new AMListBox() )
+                }
+            } else {
+                layout.addAMObject( new AMListBox() )
+            }
             this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
         }
 
-        addClone() {
+        addClone(e) {
             if ( !layout.selectedObject || ( ( layout.selectedObject instanceof AMImage ) == false && layout.selectedObject instanceof AMArtwork == false ) ) return
+            
+            //create a clone of the object
             var cloned = getInstance(layout.selectedObject.type)
-            cloned.editor.clone = layout.selectedObject.type + layout.selectedObject.id
-            console.log('cloning: ' + cloned.editor.clone)
+            cloned.editor.clone = layout.selectedObject.id
             //clone parent properties
             Object.keys(layout.selectedObject.values).forEach(function(key) {
                 cloned.values[key] = layout.selectedObject.values[key]
             })
-            layout.addAMObject( cloned )
+
+            var selected = this.root.querySelector('.item.selected')
+            if ( selected ) {
+                var object = layout.findObjectById( selected.getAttribute('data-id') )
+                if ( object && selected.classList.value.indexOf('surface') >= 0 ) {
+                    //surface selected, add to it
+                    object.addObject( cloned )
+                } else if ( object && object.editor.surface ) {
+                    //object on surface selected, add to that surface
+                    var surface = layout.findObjectById( object.editor.surface )
+                    surface.addObject( cloned )
+                } else {
+                    //fallback
+                    layout.addAMObject( cloned )
+                }
+            } else {
+                layout.addAMObject( cloned )
+            }
             this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
+        }
+
+        addSurface() {
+            var surfaceSelected = this.root.querySelector('.item.surface.selected')
+            if ( surfaceSelected ) {
+                console.warn('do no support surfaces on surfaces yet')
+            } else {
+                layout.addAMObject( new AMSurface() )
+                this.root.querySelector('.list').scrollTop = this.root.querySelector('.list').scrollHeight
+            }
         }
 
         //whether to show the objects list
@@ -137,7 +247,7 @@
 
         //select the clicked object in the layout
         selectObject(e) {
-            var selected = layout.findObjectById(e.target.getAttribute('data-id'))
+            var selected = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
             if ( selected ) layout.select( selected.el )
         }
 
@@ -175,5 +285,12 @@
             }
         }
 
+        //toggle showing children for surfaces
+        toggleChildren(e) {
+            var clickedObject = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
+            clickedObject.editor.expanded = !clickedObject.editor.expanded
+            var children = this.root.querySelector( '.' + clickedObject.type + clickedObject.id + '-children')
+            children.style.display = ( children.style.display == 'none' ) ? '' : 'none'
+        }
     </script>
 </menu-objects>
