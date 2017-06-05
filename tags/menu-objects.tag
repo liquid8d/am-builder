@@ -25,6 +25,8 @@
         .item .expandable.collapsed::before { margin: 0 5px 0 5px; content: "+"; }
         .item .expandable.expanded::before { margin: 0 5px 0 5px; content: '-'; border-bottom: none; }
         .children { border-right: 1px solid #333; border-bottom: 1px solid #333; border-left: 1px solid #333; }
+        .children.expanded { display: block; }
+        .children.collapsed { display: none }
     </style>
     <!-- top toolbar -->
     <div class="horizontal-toolbar" style="height: 20px; flex-shrink: 0;">
@@ -40,11 +42,11 @@
                 <input type="text" style="width: 100%;" data-id="{ item.id }" value="{item.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
                 <div class="icon trash" onclick="{ deleteObject }"></div>
             </div>
-            <div if="{ item.type == 'AMSurface' }" class="children {item.type + item.id}-children">
+            <div if="{ item.type == 'AMSurface' }" class="children {item.type + item.id}-children { ( item.editor.expanded ) ? 'expanded' : 'collapsed' }">
                 <div each="{ subitem in item.objects }" class="item { ( subitem.editor.clone ) ? 'clone' : '' }" data-id="{ subitem.id }" onclick="{ selectObject }">
                     <div class="icon { ( subitem.editor.hidden ) ? 'hide' : 'show' }" onclick="{ toggleVisible }"></div>
                     <div class="icon { ( subitem.editor.locked ) ? 'lock' : 'unlock' }" onclick="{ toggleLock }"></div>
-                    <input type="text" style="width: 100%;" value="{subitem.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
+                    <input type="text" style="width: 100%;" data-id="{ subitem.id }" value="{subitem.label}" ondblclick="{ editLabelStart }" onkeydown="{ editLabelEnd }" onblur="{ editLabelEnd }" readonly="readonly" />
                     <div class="icon trash" onclick="{ deleteObject }"></div>
                 </div>
             </div>
@@ -290,7 +292,13 @@
             var clickedObject = layout.findObjectById( e.target.parentElement.getAttribute('data-id') )
             clickedObject.editor.expanded = !clickedObject.editor.expanded
             var children = this.root.querySelector( '.' + clickedObject.type + clickedObject.id + '-children')
-            children.style.display = ( children.style.display == 'none' ) ? '' : 'none'
+            if ( clickedObject.editor.expanded ) {
+                children.classList.remove('collapsed')
+                children.classList.add('expanded')
+            } else {
+                children.classList.remove('expanded')
+                children.classList.add('collapsed')
+            }
         }
     </script>
 </menu-objects>

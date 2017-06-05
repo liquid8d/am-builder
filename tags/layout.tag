@@ -336,8 +336,7 @@
                         obj.objects.forEach(function(subobj) {
                             var newChild = getInstance(subobj.type)
                             Object.keys(subobj).forEach(function(key) {
-                                //if ( key != 'objects' ) newObj[key] = obj[key]
-                                newChild[key] = subobj[key]
+                                if ( key != 'objects' ) newChild[key] = subobj[key]
                             })
                             surface.addObject(newChild)
                         })
