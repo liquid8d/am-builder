@@ -131,6 +131,21 @@ AMObject.prototype.createFilterColor = function( id, r, g, b) {
     svg.appendChild(filter)
 }
 
+AMObject.prototype.transform = function() {
+    //transforms
+    if ( !this.el ) return
+    var transform = 'translate(' + this.values.x + 'px, ' + this.values.y + 'px)'
+    transform += ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
+    if ( this.values.skew_x || this.values.skew_y ) {
+        //px to deg?? http://inamidst.com/stuff/notes/csspx
+        var skew_x = ( ( Math.atan( parseFloat() / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
+        var skew_y = ( ( Math.atan( parseFloat(this.values.skew_x) / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
+        transform += ' skew(' + ( this.values.skew_x / 2 ) + 'deg, ' + ( this.values.skew_y / 2 ) + 'deg)'
+    }
+    this.el.style.transform = transform
+    this.el.style.transformOrigin = '0 0'
+}
+
 //create stretched sprites - scales spritesheet, then clips a specific sprite for subimg
 AMObject.prototype.resizeSprite = function( img, width, height, subimg_x, subimg_y, subimg_width, subimg_height ) {
     var scaleW = width / subimg_width,
@@ -146,6 +161,7 @@ AMObject.prototype.resizeSprite = function( img, width, height, subimg_x, subimg
     img.style.width = adjWidth + 'px'
     img.style.height = adjHeight + 'px'
     img.style.clip = 'rect( ' + pos.y + 'px ' + ( pos.x + pos.width ) + 'px ' + ( pos.y + pos.height ) + 'px ' + pos.x + 'px )'
+    //update existing translate or set it
     img.style.transform = 'translate( ' + -pos.x + 'px, ' + -pos.y + 'px )'
     img.style.transformOrigin = '0 0'
 }

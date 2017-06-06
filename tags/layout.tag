@@ -577,7 +577,8 @@
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
                         x = dragObject.values.x = parseFloat( dragObject.values.x ) + ( e.dx / scale ),
                         y = dragObject.values.y = parseFloat( dragObject.values.y ) + ( e.dy / scale )
-                    dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    //dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    dragObject.transform()
                     this.trigger('object-update')
                 }.bind(this))
                 .resizable({
@@ -612,7 +613,9 @@
                     // update the element's style
                     dragObject.el.style.width  =  width + 'px'
                     dragObject.el.style.height = height + 'px'
-                    dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    
+                    //dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                    dragObject.transform()
 
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works

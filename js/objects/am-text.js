@@ -39,17 +39,14 @@ class AMText extends AMObject {
     }
 
     updateElement() {
-        this.el.innerHTML = this.magicTokens( this.values.msg, this.values.index_offset )
-        //transforms
-        var transform = 'translate(' + this.values.x + 'px, ' + this.values.y + 'px)'
-        transform += ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
-        this.el.style.transform = transform
-        this.el.style.transformOrigin = '0 0'
-
-        this.el.style.width = this.values.width + 'px'
-        this.el.style.height = this.values.height + 'px'
         this.el.style.display = ( this.values.visible && !this.editor.hidden ) ? ( this.values.word_wrap ) ? 'inline-block' : 'block' : 'none'
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
+        this.el.innerHTML = this.magicTokens( this.values.msg, this.values.index_offset )
+
+        //update object transform
+        this.transform()
+        this.el.style.width = this.values.width + 'px'
+        this.el.style.height = this.values.height + 'px'
 
         var alpha = ( this.values.alpha > 0 ) ? this.values.alpha / 255 : 0
         this.el.style.color = 'rgba(' + this.values.red + ',' + this.values.green + ',' + this.values.blue + ', ' + alpha + ')'

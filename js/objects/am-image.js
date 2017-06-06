@@ -51,22 +51,14 @@ class AMImage extends AMObject {
         this.el.style.display = ( this.values.visible && !this.editor.hidden ) ? 'block' : 'none'
         if ( this.values.zorder >= 0 ) this.el.style.zIndex = this.values.zorder
 
-        //transforms
-        var transform = 'translate(' + this.values.x + 'px, ' + this.values.y + 'px)'
-        if ( this.values.rotation ) transform += ' rotate(' + this.values.rotation + 'deg)'
-        //px to deg?? http://inamidst.com/stuff/notes/csspx
-        var skew_x = ( ( Math.atan( parseFloat() / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
-        var skew_y = ( ( Math.atan( parseFloat(this.values.skew_x) / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
-        transform += ' skew(' + ( this.values.skew_x / 2 ) + 'deg, ' + ( this.values.skew_y / 2 ) + 'deg)'
-        this.el.style.transform = transform
-        this.el.style.transformOrigin = '0 0'
-
+        //update object transform
+        this.transform()
         this.el.style.width = this.values.width + 'px'
         this.el.style.height = this.values.height + 'px'
-        this.el.style.background = ''
 
         //we added a child img element for subimg, this is shown/hidden depending on the image type ( standard or subimg )
         var img = this.el.querySelector('img')
+        this.el.style.background = ''
 
         if ( this.type == "AMImage" ) {
             var file = layout.findFile(this.values.file_name, 'name')
