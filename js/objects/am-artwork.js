@@ -28,24 +28,29 @@ class AMArtwork extends AMImage {
         var currentDisplay = data.displays[data.displayIndex]
         var currentRom = currentDisplay.romlist[ ( data.listIndex + this.values.index_offset ) ]
         //if video_playing is enabled or if the ImagesOnly flag is set
-        if ( this.values.video_playing && !this.props.video_flags.values[0].checked.includes(this.values.video_flags) ) {
+        var imagesOnly = this.props.video_flags.values[0].checked.includes(this.values.video_flags)
+        if ( this.values.video_playing && !imagesOnly ) {
             //use video element for artwork video
             img.style.display = 'none'
             video.style.display = ''
-            video.src = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
+            var newSrc = 'data/media/' + currentDisplay.name + '/video/' + currentRom.Name + '.mp4'
+            var currentSrc = video.src.substring( video.src.length - newSrc.length, video.src.length)
+            if ( currentSrc != newSrc ) video.src = newSrc
             video.setAttribute('type', 'video/mp4')
             video.style.pointerEvents = 'none'
             video.style.width = '100%'
             video.style.height = '100%'
             video.style.objectFit = ( this.values.preserve_aspect_ratio ) ? 'contain' : 'fill'
-            //if not noloop
-            if ( !this.props.video_flags.values[1].checked.includes(this.values.video_flags) ) video.setAttribute('loop', true)
-            //if not noautostart
-            if ( !this.props.video_flags.values[2].checked.includes(this.values.video_flags) ) video.setAttribute('autoplay', true)
-            //if noaudio
-            if ( this.props.video_flags.values[3].checked.includes(this.values.video_flags) ) video.setAttribute('muted', true)
+            var loop = !this.props.video_flags.values[1].checked.includes(this.values.video_flags)
+            if ( loop ) video.setAttribute('loop', true); else video.removeAttribute('loop')
+            if ( loop && video.currentTime == 0 ) video.play()
+            var autoplay = !this.props.video_flags.values[2].checked.includes(this.values.video_flags) 
+            if ( autoplay ) { video.play() } else { video.pause(); video.currentTime = 0 }
+            var audio = !this.props.video_flags.values[3].checked.includes(this.values.video_flags)
+            video.muted = ( audio ) ? false : true
         } else {
             video.style.display = 'none'
+            video.src = ''
             //artwork images
             var is_subimg = ( this.values.subimg_x + this.values.subimg_y + this.values.subimg_width + this.values.subimg_height != 0 ) ? true : false
             if ( is_subimg ) {
