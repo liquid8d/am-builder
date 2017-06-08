@@ -421,40 +421,33 @@
 
         //generates the squirrel code needed for AM layouts
         generateCode() {
+            //inform user there are no objects in the layout
+            if ( this.config.objects.length == 0 )
+                return 'fe.add_text("There are no objects in this layout", 10, 10, fe.layout.width - 10, 20)'
+
             //save current aspect
             this.updateAspect(this.aspect)
 
-            var code =  ''
-            code += '///////////////////////////////////////\n'
-            code += '// Generated with AMBuilder 1.0\n'
-            code += '// https://github.com/liquid8d/am-builder\n'
-            code += '///////////////////////////////////////\n'
-            code += '\n'
-            code += '//layout configuration\n'
-            code += 'fe.layout.width = ' + this.values.width + '\n'
-            code += 'fe.layout.height = ' + this.values.height + '\n'
-            code += 'fe.layout.font = "' + this.values.font + '"\n'
-            code += 'fe.layout.base_rotation = ' + this.values.base_rotation + '\n'
-            code += 'fe.layout.toggle_rotation = ' + this.values.toggle_rotation + '\n'
-            code += 'fe.layout.page_size = ' + this.values.page_size + '\n'
-            code += 'fe.layout.preserve_aspect_ratio = ' + this.values.preserve_aspect_ratio + '\n'
-            code += '\n'
-            code += '//stored aspect values\n'
-            code += 'local aspect = "Standard (4x3)"\n'
-            var aspects = []
-            if ( this.config.objects.length == 0 ) {
-                //inform user there are no objects in the layout
-                code += 'fe.add_text("There are no objects in this layout", 10, 10, fe.layout.width - 10, 20)'
-                return code
+            //grab variables that will be replaced in the template
+            var variables = {
+                "fe.layout.width": this.values.width,
+                "fe.layout.height": this.values.height,
+                "fe.layout.font": this.values.font,
+                "fe.layout.base_rotation": this.values.base_rotation,
+                "fe.layout.toggle_rotation": this.values.toggle_rotation,
+                "fe.layout.page_size": this.values.page_size,
+                "fe.layout.preserve_aspect_ratio": this.values.preserve_aspect_ratio,
+                "defaultAspect": "Standard (4x3)",
+                "aspects": JSON.stringify(this.aspects),
+                "props": this.generatePropsCode(this.aspects),
+                "objects": this.generateObjectCode()
             }
-            //create an object with all aspects in it
-            Object.keys(this.config.objects[0].aspect_values).forEach(function(key) {
-                aspects.push(key)
+            var template = document.getElementById('layout-template').innerHTML
+            //replace template variables
+            Object.keys(variables).forEach(function(variable) {
+                template = utils.replaceAll( template, '[' + variable + ']', variables[variable] )
             })
-            //generate the object properties for all aspects and objects
-            code += 'local props = ' + this.generatePropsCode(aspects) + '\n\n'
-            code += this.generateObjectCode()
-            return code
+            return template
         }
 
         //generate the aspect property table for all layout objects
@@ -490,6 +483,7 @@
                 code = utils.replaceAll( code, '[object]', obj.id )
                 code = utils.replaceAll( code, '[props]', 'props[aspect]["' + obj.id + '"]' )
                 if ( obj.objects ) this.generateObjectCode(code, obj.objects)
+                code += '\n'
             }.bind(this))
             return code
         }

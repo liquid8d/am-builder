@@ -80,6 +80,18 @@
                 }
             })
 
+            //fetch the layout.nut template
+            utils.fetch('templates/layout.nut', {
+                complete: function(response) {
+                    var script = document.createElement('script')
+                    script.id = 'layout-template'
+                    script.type = 'text/template'
+                    script.innerHTML = response.data
+                    document.head.appendChild(script)
+                    console.log('loaded layout template')
+                }
+            })
+
             var layout, barTop, barBottom, designMenu, fileMgrMenu, settingsMenu, devMenu, menuData, menuTools, menuLayout, menuProps, menuObjects, menuNav, menuTriggers, menuMedia, menuFonts, menuShaders
             riot.compile(function() {
                 //setup design menu

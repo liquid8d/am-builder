@@ -25,7 +25,7 @@ class AMSurface extends AMImage {
     toSquirrel() {
         //note: [surface] [object] and [props] are dynamically replaced as object variables respectively
         var code = ''
-            if ( this.objects.length > 0 ) code += '///////////////////////////\n// BEGIN SURFACE: ' + this.id + '\n' + '///////////////////////////\n\n'
+            if ( this.objects.length > 0 ) code += '// BEGIN SURFACE: ' + this.id + '\n'
             if ( this.editor.clone ) {
                 code += 'local [object] = fe.add_clone([clone])' + '\n'
             } else {
@@ -40,7 +40,7 @@ class AMSurface extends AMImage {
                 code += '   [object].subimg_width = ' + this.values.subimg_width + '\n'
                 code += '   [object].subimg_height = ' + this.values.subimg_height + '\n'
             }
-            code += '\n'
+            code += '\n\n'
             for ( var i = 0; i < this.objects.length; i++) {
                 //var objId = this.objects[i].id.substring(0, this.objects[i].id.indexOf('-'))
                 var childCode = utils.replaceAll( this.objects[i].toSquirrel(), '[surface]', ( this.objects[i].editor.surface ) ? this.objects[i].editor.surface : 'fe' )
@@ -49,7 +49,7 @@ class AMSurface extends AMImage {
                     childCode = utils.replaceAll( childCode, '[props]', 'props[aspect]["' + this.objects[i].id + '"]' )
                 code += childCode + '\n'
             }
-            if ( this.objects.length > 0 ) code += '//////////////////////////////////////////////////////\n\n'
+            if ( this.objects.length > 0 ) code += '//END SURFACE: ' + this.id + '\n\n'
             return code
     }
 
