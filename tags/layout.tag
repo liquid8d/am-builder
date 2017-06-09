@@ -79,7 +79,7 @@
         }
 
         this.aspect = 'Standard (4x3)'
-        this.aspects = [ 'Standard (4x3)', 'Standard Vert (3x4)', 'Wide (16x10)', 'Wide Vert (10x16)', 'HD (16x9)', 'HD Vert (9x16)' ]
+        this.aspects = [ 'Standard (4x3)', 'Standard Vert (3x4)', 'SXGA (5x4)', 'Wide (16x10)', 'Wide Vert (10x16)', 'HD (16x9)', 'HD Vert (9x16)' ]
         this.values = {}
         this.selectedObject = null
         this.idCounter = 0
@@ -500,6 +500,10 @@
                     layout.style.width = '480px'
                     layout.style.height = '640px'
                     break
+                case 'SXGA (5x4)':
+                    layout.style.width = '1280px'
+                    layout.style.height = '1024px'
+                    break
                 case 'Wide (16x10)':
                     layout.style.width = '1280px'
                     layout.style.height = '800px'
@@ -509,12 +513,12 @@
                     layout.style.height = '1280px'
                     break
                 case 'HD (16x9)':
-                    layout.style.width = '1024px'
-                    layout.style.height = '576px'
+                    layout.style.width = '1280px'
+                    layout.style.height = '720px'
                     break
                 case 'HD Vert (9x16)':
-                    layout.style.width = '576px'
-                    layout.style.height = '1024px'
+                    layout.style.width = '720px'
+                    layout.style.height = '1280px'
                     break
             }
             console.log( 'switch from ' + this.aspect + ' to ' + aspect )
@@ -569,9 +573,10 @@
                     if ( !dragObject || dragObject.editor.locked ) return
                     dragObject.el.classList.add('selected')
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
-                        x = dragObject.values.x = parseFloat( dragObject.values.x ) + ( e.dx / scale ),
-                        y = dragObject.values.y = parseFloat( dragObject.values.y ) + ( e.dy / scale )
-                    //dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
+                        scaleX = ( e.dx * scale ) / scale,
+                        scaleY = ( e.dy * scale ) / scale,
+                        x = dragObject.values.x = parseInt( dragObject.values.x + scaleX ),
+                        y = dragObject.values.y = parseInt( dragObject.values.y + scaleY )
                     dragObject.transform()
                     this.trigger('object-update')
                 }.bind(this))
@@ -588,28 +593,18 @@
                     var dragObject = this.findObjectByEl(e.target, this.config.objects)
                     if ( !dragObject || dragObject.editor.locked ) return
                     dragObject.el.classList.add('selected')
-                    
                     var scale = ( this.config.editor.zoom / 100 ).toFixed(2),
-                        x = parseFloat(dragObject.values.x),
-                        y = parseFloat(dragObject.values.y),
-                        width = parseInt(e.rect.width / scale),
-                        height = parseInt(e.rect.height / scale)
-
-                    // translate when resizing from top or left edges
-                    x += e.deltaRect.left
-                    y += e.deltaRect.top
-
-                    dragObject.values.x = x
-                    dragObject.values.y = y
-                    dragObject.values.width = width
-                    dragObject.values.height = height
-
-                    // update the element's style
+                        scaleX = ( e.deltaRect.left * scale ) / scale,
+                        scaleY = ( e.deltaRect.top * scale ) / scale,
+                        scaleW = ( ( e.deltaRect.width * scale ) / scale ) || 0,
+                        scaleH = ( ( e.deltaRect.height * scale ) / scale ) || 0,
+                        x = dragObject.values.x = parseInt( dragObject.values.x + scaleX ),
+                        y = dragObject.values.y = parseInt( dragObject.values.y + scaleY ),
+                        width = dragObject.values.width = parseInt( dragObject.values.width + scaleW ),
+                        height = dragObject.values.height = parseInt( dragObject.values.height + scaleH )
+                    dragObject.transform()
                     dragObject.el.style.width  =  width + 'px'
                     dragObject.el.style.height = height + 'px'
-                    
-                    //dragObject.el.style.transform = 'translate(' + x + 'px, ' + y + 'px' + ')'
-                    dragObject.transform()
 
                     //for image sprites (subimg), we have to force an update for the new transform
                     //hacky, but it works
