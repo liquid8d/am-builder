@@ -521,19 +521,25 @@
                     layout.style.height = '1280px'
                     break
             }
+
             console.log( 'switch from ' + this.aspect + ' to ' + aspect )
-            this.config.objects.forEach(function(obj) {
-                //store current aspect values
-                obj.aspect_values[this.aspect] = JSON.parse(JSON.stringify(obj.values))
-                if ( obj.aspect_values[aspect] ) obj.values = JSON.parse(JSON.stringify(obj.aspect_values[aspect]))
-                obj.updateElement()
-            }.bind(this))
+            this.updateAspectValues(aspect)
             this.aspect = aspect
+
             this.trigger('object-update')
         }
 
-        saveAspect() {
-            
+        //update values for specified aspect for all objects
+        updateAspectValues(aspect, objects) {
+            if ( !objects ) objects = this.config.objects
+            objects.forEach(function(obj) {
+                //store current aspect values
+                obj.aspect_values[this.aspect] = JSON.parse(JSON.stringify(obj.values))
+                //switch to new aspect, using stored aspect values if available
+                if ( obj.aspect_values[aspect] ) obj.values = JSON.parse(JSON.stringify(obj.aspect_values[aspect]))
+                if ( obj.objects ) this.updateAspectValues( aspect, obj.objects )
+                obj.updateElement()
+            }.bind(this))
         }
 
         setZoom(per) {
