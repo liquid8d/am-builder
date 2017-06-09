@@ -285,18 +285,18 @@
             riot.mixin('utils').save('values', this.values)
             riot.mixin('utils').save('files', this.config.files)
             //convert objects to standard JS object
-            var objects = this.saveObjects()
+            var objects = this.convertObjects()
             riot.mixin('utils').save('objects', objects )
         }
 
-        saveObjects(objects) {
+        convertObjects(objects) {
             if ( !objects ) objects = this.config.objects
             var list = []
             objects.forEach(function(obj) {
                 var saveObj = {
                     id: obj.id,
                     label: obj.label,
-                    objects: ( obj.objects ) ? this.saveObjects(obj.objects) : null,
+                    objects: ( obj.objects ) ? this.convertObjects(obj.objects) : null,
                     editor: obj.editor,
                     type: obj.type,
                     aspect_values: obj.aspect_values,
@@ -530,6 +530,10 @@
             }.bind(this))
             this.aspect = aspect
             this.trigger('object-update')
+        }
+
+        saveAspect() {
+            
         }
 
         setZoom(per) {
