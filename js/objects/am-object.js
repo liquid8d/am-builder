@@ -136,12 +136,8 @@ AMObject.prototype.transform = function() {
     if ( !this.el ) return
     var transform = 'translate(' + this.values.x + 'px, ' + this.values.y + 'px)'
     transform += ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
-    if ( this.values.skew_x || this.values.skew_y ) {
-        //px to deg?? http://inamidst.com/stuff/notes/csspx
-        var skew_x = ( ( Math.atan( parseFloat() / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
-        var skew_y = ( ( Math.atan( parseFloat(this.values.skew_x) / 5376) * 2 ) * 180 / Math.PI ).toFixed(3)
+    if ( this.values.skew_x || this.values.skew_y )
         transform += ' skew(' + ( this.values.skew_x / 2 ) + 'deg, ' + ( this.values.skew_y / 2 ) + 'deg)'
-    }
     this.el.style.transform = transform
     this.el.style.transformOrigin = '0 0'
 }

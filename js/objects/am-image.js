@@ -99,6 +99,17 @@ class AMImage extends AMObject {
         this.el.style.opacity = alpha
         this.el.draggable = false
     }
+    
+    transform() {
+        //images use a point of origin for translations
+        if ( !this.el ) return
+        this.el.style.transformOrigin = this.values.origin_x + 'px ' + this.values.origin_y + 'px'
+        var transform = 'translate(' + ( this.values.x - this.values.origin_x ) + 'px, ' + ( this.values.y - this.values.origin_y ) + 'px)'
+        transform += ( this.values.rotation ) ? 'rotate(' + this.values.rotation + 'deg)' : ''
+        if ( this.values.skew_x || this.values.skew_y )
+            transform += ' skew(' + ( this.values.skew_x / 2 ) + 'deg, ' + ( this.values.skew_y / 2 ) + 'deg)'
+        this.el.style.transform = transform
+    }
 
     toSquirrel() {
         //note: [surface] [object] and [props] are dynamically replaced as object variables respectively
@@ -109,14 +120,18 @@ class AMImage extends AMObject {
                 code += 'local [object] = [surface].add_image( "resources/" + [props].file_name, -1, -1, 1, 1)' + '\n'
             }
             code += '   foreach( key, val in props[aspect]["[object]"] )\n'
-            code += '      if ( key != "file_name" && key != "subimg_width" && key != "subimg_height" && key != "zorder" && key != "shader" )\n'
-            code += '         try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'
-            if ( this.values.zorder >= 0 )
-                code += '   [object].zorder = ' + this.values.zorder + '\n'
-            if ( this.values.subimg_width != 0 || this.values.subimg_height != 0 ) {
-                code += '   [object].subimg_width = ' + this.values.subimg_width + '\n'
-                code += '   [object].subimg_height = ' + this.values.subimg_height + '\n'
-            }
+           //the keys need to be set separately from other properties
+            code += '   if ( key != "file_name" && key != "subimg_width" && key != "subimg_height" && key != "zorder" && key != "rotation" && key != "skew_x" && key != "skew_y" && key != "shader" )\n'
+            code += '      try { [object][key] = val } catch(e) { print("error setting property: " + key + "\\n" ) }\n'
+            code += '   if ( [props].zorder >= 0 ) [object].zorder = [props].zorder\n'
+            code += '   if ( [props].subimg_width !=0 || [props].subimg_height != 0 ) {\n'
+            code += '      [object].subimg_width = [props].subimg_width\n'
+            code += '      [object].subimg_height = [props].subimg_height\n'
+            code += '   }\n'
+            code += '   //these have to be set after origin\n'
+            code += '   [object].rotation = [props].rotation\n'
+            code += '   [object].skew_x = [props].skew_x\n'
+            code += '   [object].skew_y = [props].skew_y\n'
             return code
     }
 }
